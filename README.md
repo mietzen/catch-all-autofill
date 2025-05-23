@@ -19,6 +19,13 @@ A Firefox browser extension that generates unique, disposable email addresses us
 
 You need a **catch-all email** setup on your domain. This means any email sent to `anything@yourdomain.com` will be delivered to your main inbox. Most email providers and hosting services offer this feature.
 
+Make sure you setup:
+   - SPF entry and its parameters as a TXT record in the DNS settings of your provider
+   - DKIM entries as CNAME records in the DNS settings of your provider
+   - DMARC entry and its parameters as a TXT record in the DNS settings of your provider.
+
+Otherwise your domain might be flaged and you wont be able to get mails.
+
 ## Installation
 
 Install directly from the Firefox Add-ons store.
@@ -34,7 +41,9 @@ Install directly from the Firefox Add-ons store.
 2. **Optional - Custom Wordlist**:
    - In settings, you can configure a custom wordlist URL
    - The URL should point to a text file with one word per line
-   - Default uses a German diceware wordlist
+   - There are two list inside this repo:
+     - English Diceware Wordlist (default) [[Source]](https://www.eff.org/files/2016/07/18/eff_large_wordlist.txt): `https://raw.githubusercontent.com/mietzen/catch-all-autofill/refs/heads/main/wordlists/eff_large_wordlist.txt`
+     - German Diceware Wordlist [[Source]](https://github.com/dys2p/wordlists-de/blob/main/de-7776-v1.txt): `https://raw.githubusercontent.com/mietzen/catch-all-autofill/refs/heads/main/wordlists/de-7776-v1.txt`
 
 ## Usage
 
