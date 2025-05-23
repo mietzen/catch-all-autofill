@@ -1,0 +1,72 @@
+# Catch-All Email Autofill
+
+A Firefox browser extension that generates unique, disposable email addresses using your own catch-all domain for enhanced privacy and organization.
+
+## Features
+
+- **Unique Email Generation**: Creates memorable email addresses using a pattern like `word_word_123@yourdomain.com`
+- **Visual Integration**: Adds convenient email icons directly into email input fields on web pages
+- **Multiple Input Methods**:
+  - Click icons in email fields
+  - Use the browser toolbar popup
+  - Right-click context menu on any input field
+  - Bulk fill all email fields on a page
+- **Customizable Wordlists**: Use default German wordlist or configure your own remote wordlist URL
+- **Usage Tracking**: Keep track of all generated emails with export capabilities (JSON/CSV)
+- **Privacy-Focused**: All data stored locally, no external services required
+
+## Prerequisites
+
+You need a **catch-all email** setup on your domain. This means any email sent to `anything@yourdomain.com` will be delivered to your main inbox. Most email providers and hosting services offer this feature.
+
+## Installation
+
+Install directly from the Firefox Add-ons store.
+
+## Setup
+
+1. **Configure Your Domain**:
+   - Click the extension icon in your toolbar
+   - Click "⚙️ Settings" or the extension will prompt you on first use
+   - Enter your catch-all domain (e.g., `mydomain.com`)
+   - Click "Save Domain"
+
+2. **Optional - Custom Wordlist**:
+   - In settings, you can configure a custom wordlist URL
+   - The URL should point to a text file with one word per line
+   - Default uses a German diceware wordlist
+
+## Usage
+
+### Method 1: Email Field Icons
+- Email input fields will automatically show a ✉️ icon
+- Click the icon to generate and fill an email address
+
+### Method 2: Toolbar Popup
+- Click the extension icon in your browser toolbar
+- Click "Generate for this Domain" to create a new email or use a previous generated one
+- Click on the icon to copy the address and paste it into the email field
+
+### Method 3: Context Menu
+- Right-click on any input field
+- Select "Generate Email for this field"
+
+## Managing Generated Emails
+
+- View all generated emails in extension settings
+- Filter by domain to find specific emails
+- Copy any previously generated email with one click
+- Export your email history as JSON or CSV
+- Delete individual entries or clear all history
+
+## Todo:
+
+- Port to Chrome
+- Use Font Awesome instead of emoji
+- Test Sync
+- Upload to Stores
+- CI/CD
+- Refactoring (Duplication, hardcoded stuff, etc.)
+- Check if E-Mail is valid
+- Generation options (1-x Words / digits / separator char)
+- Screenshots / screencasts

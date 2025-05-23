@@ -1,0 +1,59 @@
+{
+  "manifest_version": 2,
+  "name": "Catch-All Email Autofill",
+  "version": "1.4",
+  "description": "Generate and autofill unique disposable emails using your own catch-all domain",
+  "permissions": [
+    "storage",
+    "tabs",
+    "activeTab",
+    "clipboardWrite",
+    "notifications",
+    "contextMenus",
+    "<all_urls>"
+  ],
+  "browser_action": {
+    "default_popup": "popup.html",
+    "default_title": "Generate Email",
+    "default_icon": {
+      "16": "icons/icon-16.png",
+      "32": "icons/icon-32.png",
+      "48": "icons/icon-48.png",
+      "96": "icons/icon-96.png"
+    }
+  },
+  "background": {
+    "scripts": ["browser-polyfill.js", "utils.js", "background.js"],
+    "persistent": false
+  },
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["browser-polyfill.js", "content.js"],
+      "run_at": "document_idle",
+      "all_frames": true
+    }
+  ],
+  "icons": {
+    "16": "icons/icon-16.png",
+    "32": "icons/icon-32.png",
+    "48": "icons/icon-48.png",
+    "96": "icons/icon-96.png",
+    "128": "icons/icon-128.png",
+    "256": "icons/icon-256.png",
+    "512": "icons/icon-512.png"
+  },
+  "options_ui": {
+    "page": "options.html",
+    "open_in_tab": true
+  },
+  "browser_specific_settings": {
+    "gecko": {
+      "id": "catch-all-email@example.com",
+      "strict_min_version": "57.0"
+    }
+  },
+  "web_accessible_resources": [
+    "icons/*"
+  ]
+}
