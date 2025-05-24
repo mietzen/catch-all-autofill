@@ -70,8 +70,8 @@ const CONFIG = {
 
   // Selectors
   SELECTORS: {
-    EMAIL_INPUTS: 'input[type="email"]',
-    PASSWORD_MANAGER_EXCLUSIONS: '[data-lastpass-icon-root], [data-1password-icon]'
+  EMAIL_INPUTS: 'input[autocomplete="email"], input[autocomplete="username"], input[id="email"], input[id="username"], input[name="email"], input[name="username"], input[type="email"]',
+  PASSWORD_MANAGER_EXCLUSIONS: '[data-lastpass-icon-root], [data-1password-icon]'
   }
 };
 
