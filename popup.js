@@ -20,7 +20,6 @@ class PopupController {
   setupEventListeners() {
     document.getElementById('generate').addEventListener('click', () => this.handleGenerate());
     document.getElementById('copy').addEventListener('click', () => this.handleCopy());
-    document.getElementById('fill-forms').addEventListener('click', () => this.handleFillForms());
     document.getElementById('open-options').addEventListener('click', (e) => this.handleOpenOptions(e));
   }
 
@@ -78,61 +77,6 @@ class PopupController {
 
     const success = await UIUtils.copyToClipboard(emailText);
     this.showStatus(success ? "Copied to clipboard!" : "Failed to copy", !success);
-  }
-
-  async handleFillForms() {
-    try {
-      const { [CONFIG.STORAGE_KEYS.CATCH_ALL_DOMAIN]: catchAllDomain } =
-        await StorageUtils.get(CONFIG.STORAGE_KEYS.CATCH_ALL_DOMAIN);
-
-      if (!catchAllDomain) {
-        this.showStatus("No domain configured", true);
-        return;
-      }
-
-      const tab = await BrowserUtils.getCurrentTab();
-      const generatedEmail = await EmailGenerator.generate(catchAllDomain);
-
-      const results = await BrowserUtils.executeScript(tab.id,
-        this.generateFillFormsScript(generatedEmail)
-      );
-
-      const { filledCount, generatedEmail: resultEmail, domain } = results[0];
-
-      if (filledCount > 0) {
-        this.showStatus(`Filled ${filledCount} email field(s)`);
-        await UsageLogger.log(domain, resultEmail);
-        await this.loadExistingEmails();
-      } else {
-        this.showStatus("No empty email fields found");
-      }
-    } catch (error) {
-      console.error("Error filling forms:", error);
-      this.showStatus("Error filling forms", true);
-    }
-  }
-
-  generateFillFormsScript(generatedEmail) {
-    return `
-      (async function() {
-        const generatedEmail = "${generatedEmail}";
-        const domain = window.location.hostname;
-        
-        const emailFields = document.querySelectorAll('${CONFIG.SELECTORS.EMAIL_INPUTS}');
-        let filledCount = 0;
-        
-        for (const field of emailFields) {
-          if (!field.value && !field.dataset.noCatchAllFill) {
-            field.value = generatedEmail;
-            field.dispatchEvent(new Event('input', { bubbles: true }));
-            field.dispatchEvent(new Event('change', { bubbles: true }));
-            filledCount++;
-          }
-        }
-        
-        return { filledCount, generatedEmail, domain };
-      })()
-    `;
   }
 
   async loadExistingEmails() {
