@@ -120,24 +120,82 @@ const WordlistManager = {
   }
 };
 
-/**
- * Email generation utilities
- */
-const EmailGenerator = {
-  pickRandom(arr) {
-    return arr[Math.floor(Math.random() * arr.length)];
-  },
+class EmailGenerator {
+  static async generate(domain) {
+    let attempts = 0;
+    let email;
 
-  generateDigits() {
-    return Math.floor(CONFIG.EMAIL.MIN_DIGITS + Math.random() * CONFIG.EMAIL.MAX_DIGITS);
-  },
+    do {
+      attempts++;
+      const wordlist = await WordlistManager.load();
+      const word1 = this.pickRandom(wordlist);
+      const word2 = this.pickRandom(wordlist);
+      const digits = this.generateDigits();
 
-  async generate(catchAllDomain) {
-    const wordlist = await WordlistManager.load();
-    const w1 = this.pickRandom(wordlist);
-    const w2 = this.pickRandom(wordlist);
-    const digits = this.generateDigits();
-    return `${w1}_${w2}_${digits}@${catchAllDomain}`;
+      email = `${word1}_${word2}_${digits}@${domain}`;
+
+      // Check length
+      if (email.length > CONFIG.EMAIL.MAX_EMAIL_LENGTH) {
+        continue;
+      }
+
+      // Check for collision
+      if (await this.isEmailUnique(email)) {
+        break;
+      }
+
+      email = null;
+    } while (attempts < CONFIG.EMAIL.MAX_RETRIES);
+
+    if (!email) {
+      throw new Error('Unable to generate unique email after maximum retries');
+    }
+
+    return email;
+  }
+
+  static async isEmailUnique(email) {
+    try {
+      const usageLog = await UsageLogger.getLog();
+      return !usageLog.some(entry => entry.generatedEmail === email);
+    } catch (error) {
+      console.error('Error checking email uniqueness:', error);
+      return true; // Assume unique if check fails
+    }
+  }
+
+  static validateEmail(email) {
+    const errors = [];
+
+    // Length check
+    if (email.length > CONFIG.EMAIL.MAX_EMAIL_LENGTH) {
+      errors.push(`Email too long (${email.length}/${CONFIG.EMAIL.MAX_EMAIL_LENGTH} chars)`);
+    }
+
+    // Basic format check
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      errors.push('Invalid email format');
+    }
+
+    // Local part length (before @)
+    const localPart = email.split('@')[0];
+    if (localPart && localPart.length > 64) {
+      errors.push('Local part too long (max 64 chars)');
+    }
+
+    return {
+      isValid: errors.length === 0,
+      errors: errors
+    };
+  }
+
+  static pickRandom(wordlist) {
+    return wordlist[Math.floor(Math.random() * wordlist.length)];
+  }
+
+  static generateDigits() {
+    return Math.floor(Math.random() * (CONFIG.EMAIL.MAX_DIGITS - CONFIG.EMAIL.MIN_DIGITS + 1)) + CONFIG.EMAIL.MIN_DIGITS;
   }
 };
 

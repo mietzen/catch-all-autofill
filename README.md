@@ -74,9 +74,6 @@ Install directly from the Firefox Add-ons store.
 
 ## Todo
 
-- Refactoring:
-  - Folder structure
-- Check if E-Mail is valid or collides with existing
 - Json export should save all settings!
 - Json import
 - Github backup option (Json export) <https://stackoverflow.com/a/69290756/6847446> (GraphQL)
