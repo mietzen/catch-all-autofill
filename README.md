@@ -92,10 +92,15 @@ Install directly from the Firefox Add-ons store.
 - Json import
 - Github backup option (Json export) <https://stackoverflow.com/a/69290756/6847446> (GraphQL)
 
+  Buttons:
+  - Save (saves the config)
+  - Backup (commits the config)
+
   Settings:
   - branch (default: main)
   - repository (name with owner, e.g.: demo-githubs/test)
-  - PAT
+  - PAT (Should be excluded from backup!)
+
 - Screenshots / screencasts
 - Port to Chrome
 - Test Sync
