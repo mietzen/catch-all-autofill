@@ -28,7 +28,6 @@ class OptionsController {
 
     // Export functions
     document.getElementById('download-json').addEventListener('click', () => this.handleExportJson());
-    document.getElementById('download-csv').addEventListener('click', () => this.handleExportCsv());
 
     // History management
     document.getElementById('filter-domain').addEventListener('input', (e) => this.loadLogData(e.target.value));
@@ -199,16 +198,6 @@ class OptionsController {
       this.showStatus("JSON file downloaded");
     } catch (error) {
       console.error("Error downloading JSON:", error);
-      this.showStatus(error.message === 'No data to export' ? error.message : "Error downloading file", true);
-    }
-  }
-
-  async handleExportCsv() {
-    try {
-      await ExportUtils.exportAsCsv();
-      this.showStatus("CSV file downloaded");
-    } catch (error) {
-      console.error("Error downloading CSV:", error);
       this.showStatus(error.message === 'No data to export' ? error.message : "Error downloading file", true);
     }
   }

@@ -311,20 +311,6 @@ const ExportUtils = {
     const data = JSON.stringify(usageLog, null, 2);
     const filename = `email_log_${new Date().toISOString().slice(0, 10)}.json`;
     UIUtils.downloadFile(data, filename, 'application/json');
-  },
-
-  async exportAsCsv() {
-    const usageLog = await UsageLogger.getLog();
-    if (usageLog.length === 0) {
-      throw new Error('No data to export');
-    }
-
-    const headers = "email,domain,date\n";
-    const csvContent = headers +
-      usageLog.map(e => `"${e.generatedEmail}","${e.domain}","${e.date}"`).join('\n');
-
-    const filename = `email_log_${new Date().toISOString().slice(0, 10)}.csv`;
-    UIUtils.downloadFile(csvContent, filename, 'text/csv');
   }
 };
 
