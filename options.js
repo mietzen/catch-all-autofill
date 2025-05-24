@@ -1,348 +1,354 @@
 /**
- * Options page script for managing settings and viewing history
+ * Refactored options page script for managing settings and viewing history
  */
 
-// Show status message
-function showStatus(message, isError = false) {
-  const statusElement = document.getElementById('status');
-  statusElement.textContent = message;
-  statusElement.className = isError ? 'status-error' : '';
-  statusElement.style.opacity = 1;
-  
-  setTimeout(() => {
-    statusElement.style.opacity = 0;
-  }, 3000);
-}
+class OptionsController {
+  constructor() {
+    this.init();
+  }
 
-// Save domain
-document.getElementById('save').addEventListener('click', async () => {
-  const domain = document.getElementById('domain').value.trim();
-  
-  if (!domain) {
-    showStatus("Please enter a domain", true);
-    return;
-  }
-  
-  if (!isValidDomain(domain)) {
-    showStatus("Please enter a valid domain", true);
-    return;
-  }
-  
-  try {
-    await browser.storage.sync.set({ catchAllDomain: domain });
-    showStatus("Domain saved successfully!");
-    updateExampleEmail(domain);
-  } catch (error) {
-    console.error("Error saving domain:", error);
-    showStatus("Error saving domain", true);
-  }
-});
-
-// Save wordlist URL
-document.getElementById('save-wordlist-url').addEventListener('click', async () => {
-  const url = document.getElementById('wordlist-url').value.trim();
-  
-  if (!url) {
-    showStatus("Please enter a wordlist URL", true);
-    return;
-  }
-  
-  if (!isValidUrl(url)) {
-    showStatus("Please enter a valid URL", true);
-    return;
-  }
-  
-  try {
-    // Test the URL first
-    showStatus("Testing URL...");
-    await fetch(url);
-    
-    await browser.storage.sync.set({ wordlistUrl: url });
-    
-    // Clear cache and reload wordlist
-    clearWordlistCache();
-    await clearWordlistLocalCache();
-    
-    showStatus("Wordlist URL saved! Reloading wordlist...");
-    await updateWordlistStatus();
-    await updateExampleEmail(document.getElementById('domain').value);
-  } catch (error) {
-    console.error("Error saving wordlist URL:", error);
-    showStatus("Error: Could not fetch wordlist from URL", true);
-  }
-});
-
-// Reset to default wordlist URL
-document.getElementById('reset-wordlist-url').addEventListener('click', async () => {
-  if (confirm('Reset to default wordlist URL?')) {
+  async init() {
     try {
-      const defaultUrl = 'https://raw.githubusercontent.com/dys2p/wordlists-de/refs/heads/main/de-7776-v1.txt';
-      document.getElementById('wordlist-url').value = defaultUrl;
+      this.setupEventListeners();
+      await this.initializeUI();
+    } catch (error) {
+      console.error("Error initializing options page:", error);
+    }
+  }
+
+  setupEventListeners() {
+    // Domain settings
+    document.getElementById('save').addEventListener('click', () => this.handleSaveDomain());
+    document.getElementById('domain').addEventListener('input', (e) => this.updateExampleEmail(e.target.value.trim()));
+    
+    // Wordlist settings
+    document.getElementById('save-wordlist-url').addEventListener('click', () => this.handleSaveWordlistUrl());
+    document.getElementById('reset-wordlist-url').addEventListener('click', () => this.handleResetWordlistUrl());
+    document.getElementById('reload-wordlist').addEventListener('click', () => this.handleReloadWordlist());
+    
+    // Export functions
+    document.getElementById('download-json').addEventListener('click', () => this.handleExportJson());
+    document.getElementById('download-csv').addEventListener('click', () => this.handleExportCsv());
+    
+    // History management
+    document.getElementById('filter-domain').addEventListener('input', (e) => this.loadLogData(e.target.value));
+    document.getElementById('clear-filter').addEventListener('click', () => this.handleClearFilter());
+    document.getElementById('clear-history').addEventListener('click', () => this.handleClearHistory());
+  }
+
+  async initializeUI() {
+    await this.loadDomainSettings();
+    await this.updateWordlistStatus();
+    await this.loadLogData();
+  }
+
+  showStatus(message, isError = false) {
+    const statusElement = document.getElementById('status');
+    statusElement.textContent = message;
+    statusElement.className = isError ? 'status-error' : '';
+    statusElement.style.opacity = 1;
+    
+    setTimeout(() => {
+      statusElement.style.opacity = 0;
+    }, CONFIG.ANIMATION.NOTIFICATION_DURATION);
+  }
+
+  async loadDomainSettings() {
+    const { [CONFIG.STORAGE_KEYS.CATCH_ALL_DOMAIN]: catchAllDomain } = 
+      await StorageUtils.get(CONFIG.STORAGE_KEYS.CATCH_ALL_DOMAIN);
+    
+    if (catchAllDomain) {
+      document.getElementById('domain').value = catchAllDomain;
+      this.updateExampleEmail(catchAllDomain);
+    }
+  }
+
+  async handleSaveDomain() {
+    const domain = document.getElementById('domain').value.trim();
+    
+    if (!domain) {
+      this.showStatus("Please enter a domain", true);
+      return;
+    }
+    
+    if (!ValidationUtils.isValidDomain(domain)) {
+      this.showStatus("Please enter a valid domain", true);
+      return;
+    }
+    
+    try {
+      await StorageUtils.set({ [CONFIG.STORAGE_KEYS.CATCH_ALL_DOMAIN]: domain });
+      this.showStatus("Domain saved successfully!");
+      this.updateExampleEmail(domain);
+    } catch (error) {
+      console.error("Error saving domain:", error);
+      this.showStatus("Error saving domain", true);
+    }
+  }
+
+  async handleSaveWordlistUrl() {
+    const url = document.getElementById('wordlist-url').value.trim();
+    
+    if (!url) {
+      this.showStatus("Please enter a wordlist URL", true);
+      return;
+    }
+    
+    if (!ValidationUtils.isValidUrl(url)) {
+      this.showStatus("Please enter a valid URL", true);
+      return;
+    }
+    
+    try {
+      this.showStatus("Testing URL...");
+      await fetch(url);
       
-      await browser.storage.sync.set({ wordlistUrl: defaultUrl });
+      await StorageUtils.set({ [CONFIG.STORAGE_KEYS.WORDLIST_URL]: url });
       
-      // Clear cache and reload wordlist
-      clearWordlistCache();
-      await clearWordlistLocalCache();
+      WordlistManager.clearCache();
+      await WordlistManager.clearLocalCache();
       
-      showStatus("Reset to default wordlist URL");
-      await updateWordlistStatus();
-      await updateExampleEmail(document.getElementById('domain').value);
+      this.showStatus("Wordlist URL saved! Reloading wordlist...");
+      await this.updateWordlistStatus();
+      await this.updateExampleEmail(document.getElementById('domain').value);
+    } catch (error) {
+      console.error("Error saving wordlist URL:", error);
+      this.showStatus("Error: Could not fetch wordlist from URL", true);
+    }
+  }
+
+  async handleResetWordlistUrl() {
+    if (!confirm('Reset to default wordlist URL?')) return;
+    
+    try {
+      document.getElementById('wordlist-url').value = CONFIG.URLS.DEFAULT_WORDLIST;
+      
+      await StorageUtils.set({ [CONFIG.STORAGE_KEYS.WORDLIST_URL]: CONFIG.URLS.DEFAULT_WORDLIST });
+      
+      WordlistManager.clearCache();
+      await WordlistManager.clearLocalCache();
+      
+      this.showStatus("Reset to default wordlist URL");
+      await this.updateWordlistStatus();
+      await this.updateExampleEmail(document.getElementById('domain').value);
     } catch (error) {
       console.error("Error resetting wordlist URL:", error);
-      showStatus("Error resetting wordlist URL", true);
+      this.showStatus("Error resetting wordlist URL", true);
     }
   }
-});
 
-// Reload wordlist from URL
-document.getElementById('reload-wordlist').addEventListener('click', async () => {
-  try {
-    showStatus("Reloading wordlist...");
-    
-    // Force reload from URL
-    clearWordlistCache();
-    await clearWordlistLocalCache();
-    await loadWordlist(true);
-    
-    showStatus("Wordlist reloaded successfully!");
-    await updateWordlistStatus();
-    await updateExampleEmail(document.getElementById('domain').value);
-  } catch (error) {
-    console.error("Error reloading wordlist:", error);
-    showStatus("Error reloading wordlist", true);
-  }
-});
-
-// Update example email when domain changes
-document.getElementById('domain').addEventListener('input', function() {
-  updateExampleEmail(this.value.trim());
-});
-
-// Update example email display
-async function updateExampleEmail(domain) {
-  const exampleDomain = domain || 'yourdomain.com';
-  try {
-    const wordlist = await loadWordlist();
-    const w1 = pickRandom(wordlist);
-    const w2 = pickRandom(wordlist);
-    const digits = Math.floor(100 + Math.random() * 900);
-    
-    document.getElementById('example-email').textContent = 
-      `${w1}_${w2}_${digits}@${exampleDomain}`;
-  } catch (error) {
-    document.getElementById('example-email').textContent = 
-      `word_word_123@${exampleDomain}`;
-  }
-}
-
-// Update wordlist status display
-async function updateWordlistStatus() {
-  try {
-    const { wordlistUrl = 'https://raw.githubusercontent.com/dys2p/wordlists-de/refs/heads/main/de-7776-v1.txt' } = 
-      await browser.storage.sync.get('wordlistUrl');
-    
-    const wordlist = await loadWordlist();
-    const isDefault = wordlistUrl === 'https://raw.githubusercontent.com/dys2p/wordlists-de/refs/heads/main/de-7776-v1.txt';
-    
-    document.getElementById('wordlist-status').textContent = 
-      `${isDefault ? 'Default' : 'Custom'} (${wordlist.length} words)`;
-    
-    document.getElementById('wordlist-preview').textContent = 
-      wordlist.slice(0, 5).join(', ') + (wordlist.length > 5 ? '...' : '');
-    
-    // Show current URL in input
-    document.getElementById('wordlist-url').value = wordlistUrl;
-    
-  } catch (error) {
-    console.error("Error updating wordlist status:", error);
-    document.getElementById('wordlist-status').textContent = "Error loading";
-    document.getElementById('wordlist-preview').textContent = "Error";
-  }
-}
-
-// Download usage log as JSON
-document.getElementById('download-json').addEventListener('click', async () => {
-  try {
-    const { usageLog = [] } = await browser.storage.sync.get('usageLog');
-    if (usageLog.length === 0) {
-      showStatus("No data to export", true);
-      return;
-    }
-    
-    const data = JSON.stringify(usageLog, null, 2);
-    const filename = `email_log_${new Date().toISOString().slice(0, 10)}.json`;
-    downloadFile(data, filename, 'application/json');
-    showStatus("JSON file downloaded");
-  } catch (error) {
-    console.error("Error downloading JSON:", error);
-    showStatus("Error downloading file", true);
-  }
-});
-
-// Download usage log as CSV
-document.getElementById('download-csv').addEventListener('click', async () => {
-  try {
-    const { usageLog = [] } = await browser.storage.sync.get('usageLog');
-    if (usageLog.length === 0) {
-      showStatus("No data to export", true);
-      return;
-    }
-    
-    const headers = "email,domain,date\n";
-    const csvContent = headers + 
-      usageLog.map(e => `"${e.generatedEmail}","${e.domain}","${e.date}"`).join('\n');
-    
-    const filename = `email_log_${new Date().toISOString().slice(0, 10)}.csv`;
-    downloadFile(csvContent, filename, 'text/csv');
-    showStatus("CSV file downloaded");
-  } catch (error) {
-    console.error("Error downloading CSV:", error);
-    showStatus("Error downloading file", true);
-  }
-});
-
-// Filter logs by domain
-document.getElementById('filter-domain').addEventListener('input', function() {
-  loadLogData(this.value);
-});
-
-// Clear filter
-document.getElementById('clear-filter').addEventListener('click', function() {
-  document.getElementById('filter-domain').value = '';
-  loadLogData('');
-});
-
-// Clear all history
-document.getElementById('clear-history').addEventListener('click', async () => {
-  if (confirm('Are you sure you want to delete ALL email history? This cannot be undone.')) {
+  async handleReloadWordlist() {
     try {
-      await browser.storage.sync.set({ usageLog: [] });
-      showStatus("All history cleared");
-      loadLogData('');
+      this.showStatus("Reloading wordlist...");
+      
+      WordlistManager.clearCache();
+      await WordlistManager.clearLocalCache();
+      await WordlistManager.load(true);
+      
+      this.showStatus("Wordlist reloaded successfully!");
+      await this.updateWordlistStatus();
+      await this.updateExampleEmail(document.getElementById('domain').value);
+    } catch (error) {
+      console.error("Error reloading wordlist:", error);
+      this.showStatus("Error reloading wordlist", true);
+    }
+  }
+
+  async updateExampleEmail(domain) {
+    const exampleDomain = domain || 'yourdomain.com';
+    try {
+      const wordlist = await WordlistManager.load();
+      const w1 = EmailGenerator.pickRandom(wordlist);
+      const w2 = EmailGenerator.pickRandom(wordlist);
+      const digits = EmailGenerator.generateDigits();
+      
+      document.getElementById('example-email').textContent = 
+        `${w1}_${w2}_${digits}@${exampleDomain}`;
+    } catch (error) {
+      document.getElementById('example-email').textContent = 
+        `word_word_123@${exampleDomain}`;
+    }
+  }
+
+  async updateWordlistStatus() {
+    try {
+      const { [CONFIG.STORAGE_KEYS.WORDLIST_URL]: wordlistUrl = CONFIG.URLS.DEFAULT_WORDLIST } = 
+        await StorageUtils.get(CONFIG.STORAGE_KEYS.WORDLIST_URL);
+      
+      const wordlist = await WordlistManager.load();
+      const isDefault = wordlistUrl === CONFIG.URLS.DEFAULT_WORDLIST;
+      
+      document.getElementById('wordlist-status').textContent = 
+        `${isDefault ? 'Default' : 'Custom'} (${wordlist.length} words)`;
+      
+      document.getElementById('wordlist-preview').textContent = 
+        wordlist.slice(0, 5).join(', ') + (wordlist.length > 5 ? '...' : '');
+      
+      document.getElementById('wordlist-url').value = wordlistUrl;
+      
+    } catch (error) {
+      console.error("Error updating wordlist status:", error);
+      document.getElementById('wordlist-status').textContent = "Error loading";
+      document.getElementById('wordlist-preview').textContent = "Error";
+    }
+  }
+
+  async handleExportJson() {
+    try {
+      await ExportUtils.exportAsJson();
+      this.showStatus("JSON file downloaded");
+    } catch (error) {
+      console.error("Error downloading JSON:", error);
+      this.showStatus(error.message === 'No data to export' ? error.message : "Error downloading file", true);
+    }
+  }
+
+  async handleExportCsv() {
+    try {
+      await ExportUtils.exportAsCsv();
+      this.showStatus("CSV file downloaded");
+    } catch (error) {
+      console.error("Error downloading CSV:", error);
+      this.showStatus(error.message === 'No data to export' ? error.message : "Error downloading file", true);
+    }
+  }
+
+  handleClearFilter() {
+    document.getElementById('filter-domain').value = '';
+    this.loadLogData('');
+  }
+
+  async handleClearHistory() {
+    if (!confirm('Are you sure you want to delete ALL email history? This cannot be undone.')) return;
+    
+    try {
+      await UsageLogger.clearLog();
+      this.showStatus("All history cleared");
+      this.loadLogData('');
     } catch (error) {
       console.error("Error clearing history:", error);
-      showStatus("Error clearing history", true);
+      this.showStatus("Error clearing history", true);
     }
   }
-});
 
-// Load and display email usage log
-async function loadLogData(domainFilter = '') {
-  try {
-    const { usageLog = [] } = await browser.storage.sync.get('usageLog');
-    const logTable = document.getElementById('log');
-    logTable.innerHTML = '';
-    
-    // Apply domain filter if provided
-    const filteredLog = domainFilter 
-      ? usageLog.filter(entry => entry.domain.includes(domainFilter))
-      : usageLog;
-    
-    if (filteredLog.length === 0) {
-      const row = document.createElement('tr');
-      const cell = document.createElement('td');
-      cell.colSpan = 4;
-      cell.textContent = domainFilter 
-        ? "No emails found for this domain filter" 
-        : "No emails generated yet";
-      cell.style.textAlign = 'center';
-      cell.style.padding = '20px';
-      cell.style.color = '#737373';
-      row.appendChild(cell);
-      logTable.appendChild(row);
-      return;
+  async loadLogData(domainFilter = '') {
+    try {
+      const usageLog = await UsageLogger.getLog();
+      const logTable = document.getElementById('log');
+      logTable.innerHTML = '';
+      
+      const filteredLog = domainFilter 
+        ? usageLog.filter(entry => entry.domain.includes(domainFilter))
+        : usageLog;
+      
+      if (filteredLog.length === 0) {
+        this.renderEmptyLogTable(logTable, domainFilter);
+        return;
+      }
+      
+      this.renderLogTable(logTable, filteredLog);
+    } catch (error) {
+      console.error("Error loading log data:", error);
+      this.showStatus("Error loading log data", true);
     }
-    
-    // Sort by date (newest first)
+  }
+
+  renderEmptyLogTable(table, domainFilter) {
+    const row = document.createElement('tr');
+    const cell = document.createElement('td');
+    cell.colSpan = 4;
+    cell.textContent = domainFilter 
+      ? "No emails found for this domain filter" 
+      : "No emails generated yet";
+    cell.style.cssText = 'text-align: center; padding: 20px; color: #737373;';
+    row.appendChild(cell);
+    table.appendChild(row);
+  }
+
+  renderLogTable(table, filteredLog) {
     filteredLog
       .slice()
       .sort((a, b) => new Date(b.date) - new Date(a.date))
       .forEach(entry => {
-        const row = document.createElement('tr');
-        
-        // Email column
-        const emailCell = document.createElement('td');
-        emailCell.textContent = entry.generatedEmail;
-        row.appendChild(emailCell);
-        
-        // Domain column
-        const domainCell = document.createElement('td');
-        domainCell.textContent = entry.domain;
-        row.appendChild(domainCell);
-        
-        // Date column
-        const dateCell = document.createElement('td');
-        const date = new Date(entry.date);
-        dateCell.textContent = date.toLocaleString();
-        row.appendChild(dateCell);
-        
-        // Actions column
-        const actionsCell = document.createElement('td');
-        actionsCell.className = 'actions';
-        
-        // Copy button
-        const copyButton = document.createElement('button');
-        copyButton.className = 'icon-button';
-        copyButton.textContent = '📋';
-        copyButton.title = 'Copy email';
-        copyButton.addEventListener('click', () => {
-          copyToClipboard(entry.generatedEmail).then(() => {
-            showStatus('Email copied to clipboard!');
-          });
-        });
-        actionsCell.appendChild(copyButton);
-        
-        // Delete button
-        const deleteButton = document.createElement('button');
-        deleteButton.className = 'icon-button';
-        deleteButton.textContent = '🗑️';
-        deleteButton.title = 'Delete entry';
-        deleteButton.addEventListener('click', async () => {
-          if (confirm('Delete this email entry?')) {
-            try {
-              const { usageLog = [] } = await browser.storage.sync.get('usageLog');
-              const newLog = usageLog.filter(e => 
-                e.generatedEmail !== entry.generatedEmail || 
-                e.domain !== entry.domain ||
-                e.date !== entry.date
-              );
-              await browser.storage.sync.set({ usageLog: newLog });
-              showStatus('Entry deleted');
-              loadLogData(document.getElementById('filter-domain').value);
-            } catch (error) {
-              console.error('Error deleting entry:', error);
-              showStatus('Error deleting entry', true);
-            }
-          }
-        });
-        actionsCell.appendChild(deleteButton);
-        
-        row.appendChild(actionsCell);
-        logTable.appendChild(row);
+        const row = this.createLogRow(entry);
+        table.appendChild(row);
       });
-  } catch (error) {
-    console.error("Error loading log data:", error);
-    showStatus("Error loading log data", true);
+  }
+
+  createLogRow(entry) {
+    const row = document.createElement('tr');
+    
+    // Email column
+    const emailCell = document.createElement('td');
+    emailCell.textContent = entry.generatedEmail;
+    row.appendChild(emailCell);
+    
+    // Domain column
+    const domainCell = document.createElement('td');
+    domainCell.textContent = entry.domain;
+    row.appendChild(domainCell);
+    
+    // Date column
+    const dateCell = document.createElement('td');
+    const date = new Date(entry.date);
+    dateCell.textContent = date.toLocaleString();
+    row.appendChild(dateCell);
+    
+    // Actions column
+    const actionsCell = this.createActionsCell(entry);
+    row.appendChild(actionsCell);
+    
+    return row;
+  }
+
+  createActionsCell(entry) {
+    const actionsCell = document.createElement('td');
+    actionsCell.className = 'actions';
+    
+    // Copy button
+    const copyButton = this.createActionButton(
+      CONFIG.ICON.COPY_EMOJI, 
+      'Copy email',
+      async () => {
+        const success = await UIUtils.copyToClipboard(entry.generatedEmail);
+        this.showStatus(success ? 'Email copied to clipboard!' : 'Failed to copy', !success);
+      }
+    );
+    actionsCell.appendChild(copyButton);
+    
+    // Delete button
+    const deleteButton = this.createActionButton(
+      CONFIG.ICON.DELETE_EMOJI,
+      'Delete entry',
+      () => this.handleDeleteEntry(entry)
+    );
+    actionsCell.appendChild(deleteButton);
+    
+    return actionsCell;
+  }
+
+  createActionButton(emoji, title, onClick) {
+    const button = document.createElement('button');
+    button.className = 'icon-button';
+    button.textContent = emoji;
+    button.title = title;
+    button.addEventListener('click', onClick);
+    return button;
+  }
+
+  async handleDeleteEntry(entry) {
+    if (!confirm('Delete this email entry?')) return;
+    
+    try {
+      await UsageLogger.deleteEntry(entry);
+      this.showStatus('Entry deleted');
+      this.loadLogData(document.getElementById('filter-domain').value);
+    } catch (error) {
+      console.error('Error deleting entry:', error);
+      this.showStatus('Error deleting entry', true);
+    }
   }
 }
 
-// Initialize the options page
-(async () => {
-  try {
-    // Load catch-all domain if set
-    const { catchAllDomain } = await browser.storage.sync.get('catchAllDomain');
-    if (catchAllDomain) {
-      document.getElementById('domain').value = catchAllDomain;
-      updateExampleEmail(catchAllDomain);
-    }
-    
-    // Update wordlist status display
-    await updateWordlistStatus();
-    
-    // Load email history
-    await loadLogData();
-  } catch (error) {
-    console.error("Error initializing options page:", error);
-  }
-})();
+// Initialize options controller
+new OptionsController();

@@ -1,175 +1,198 @@
 /**
- * Popup script that handles the toolbar popup interface
+ * Refactored popup script that handles the toolbar popup interface
  */
 
-// Show status message with optional error styling
-function showStatus(message, isError = false) {
-  const status = document.getElementById('status');
-  status.textContent = message;
-  status.classList.toggle('error', isError);
-  status.style.opacity = 1;
-  
-  // Clear after 3 seconds
-  setTimeout(() => {
-    status.style.opacity = 0;
-  }, 3000);
-}
+class PopupController {
+  constructor() {
+    this.currentDomain = null;
+    this.init();
+  }
 
-// Generate and display email
-document.getElementById('generate').addEventListener('click', async () => {
-  try {
-    const { catchAllDomain } = await browser.storage.sync.get('catchAllDomain');
-    if (!catchAllDomain) {
-      document.getElementById('generated').textContent = "No domain configured";
-      showStatus("Please configure a catch-all domain in settings", true);
-      return;
+  async init() {
+    try {
+      await this.setupEventListeners();
+      await this.initializeUI();
+    } catch (error) {
+      console.error("Error initializing popup:", error);
     }
-
-    const currentDomain = await getCurrentDomain();
-    const generatedEmail = await generateEmail(catchAllDomain); // Fixed: await added
-    
-    await logEmailUsage(currentDomain, generatedEmail);
-    
-    document.getElementById('generated').textContent = generatedEmail;
-    document.getElementById('copy-container').style.display = 'flex';
-    
-    await loadExistingEmails();
-  } catch (error) {
-    console.error("Error generating email:", error);
-    showStatus("Error generating email", true);
   }
-});
 
-// Copy generated email to clipboard
-document.getElementById('copy').addEventListener('click', async () => {
-  const emailText = document.getElementById('generated').textContent;
-  if (!emailText) return;
-  
-  const success = await copyToClipboard(emailText);
-  if (success) {
-    showStatus("Copied to clipboard!");
-  } else {
-    showStatus("Failed to copy", true);
+  setupEventListeners() {
+    document.getElementById('generate').addEventListener('click', () => this.handleGenerate());
+    document.getElementById('copy').addEventListener('click', () => this.handleCopy());
+    document.getElementById('fill-forms').addEventListener('click', () => this.handleFillForms());
+    document.getElementById('open-options').addEventListener('click', (e) => this.handleOpenOptions(e));
   }
-});
 
-// Fill email forms on the current page
-document.getElementById('fill-forms').addEventListener('click', async () => {
-  try {
-    const { catchAllDomain } = await browser.storage.sync.get('catchAllDomain');
-    if (!catchAllDomain) {
-      showStatus("No domain configured", true);
-      return;
-    }
+  async initializeUI() {
+    const { [CONFIG.STORAGE_KEYS.CATCH_ALL_DOMAIN]: catchAllDomain } = 
+      await StorageUtils.get(CONFIG.STORAGE_KEYS.CATCH_ALL_DOMAIN);
     
-    const [tab] = await browser.tabs.query({ active: true, currentWindow: true });
-    const generatedEmail = await generateEmail(catchAllDomain); // Generate here first
-    
-    // Execute content script to fill forms
-    await browser.tabs.executeScript(tab.id, {
-      code: `
-        (async function() {
-          const generatedEmail = "${generatedEmail}";
-          const domain = window.location.hostname;
-          
-          const emailFields = document.querySelectorAll('input[type="email"]');
-          let filledCount = 0;
-          
-          for (const field of emailFields) {
-            if (!field.value && !field.dataset.noCatchAllFill) {
-              field.value = generatedEmail;
-              field.dispatchEvent(new Event('input', { bubbles: true }));
-              field.dispatchEvent(new Event('change', { bubbles: true }));
-              filledCount++;
-            }
-          }
-          
-          return { filledCount, generatedEmail, domain };
-        })()
-      `
-    }).then(async (results) => {
-      const { filledCount, generatedEmail, domain } = results[0];
-      
-      if (filledCount > 0) {
-        showStatus(`Filled ${filledCount} email field(s)`);
-        await logEmailUsage(domain, generatedEmail);
-        await loadExistingEmails();
-      } else {
-        showStatus("No empty email fields found");
-      }
-    });
-  } catch (error) {
-    console.error("Error filling forms:", error);
-    showStatus("Error filling forms", true);
-  }
-});
-
-// Display existing emails for the current domain
-async function loadExistingEmails() {
-  try {
-    const currentDomain = await getCurrentDomain();
-    const { usageLog = [] } = await browser.storage.sync.get('usageLog');
-    
-    const domainEmails = usageLog.filter(entry => entry.domain === currentDomain);
-    
-    const ul = document.getElementById('existing');
-    ul.innerHTML = '';
-    
-    if (domainEmails.length === 0) {
-      const li = document.createElement('li');
-      li.textContent = "No emails generated yet";
-      li.style.color = "#777";
-      ul.appendChild(li);
-      return;
-    }
-    
-    // Display most recent 10 emails
-    domainEmails
-      .slice(-10)
-      .reverse()
-      .forEach(entry => {
-        const li = document.createElement('li');
-        
-        const emailSpan = document.createElement('span');
-        emailSpan.textContent = entry.generatedEmail;
-        li.appendChild(emailSpan);
-        
-        const copyIcon = document.createElement('span');
-        copyIcon.textContent = "📋";
-        copyIcon.title = "Copy to clipboard";
-        copyIcon.className = "copy-icon";
-        copyIcon.addEventListener('click', () => {
-          copyToClipboard(entry.generatedEmail).then(() => {
-            showStatus("Copied to clipboard!");
-          });
-        });
-        li.appendChild(copyIcon);
-        
-        ul.appendChild(li);
-      });
-  } catch (error) {
-    console.error("Error loading emails:", error);
-  }
-}
-
-// Open options page
-document.getElementById('open-options').addEventListener('click', (e) => {
-  e.preventDefault();
-  browser.runtime.openOptionsPage();
-});
-
-// Initialize popup
-(async () => {
-  try {
-    const { catchAllDomain } = await browser.storage.sync.get('catchAllDomain');
-    
-    // Show warning if no domain is configured
     if (!catchAllDomain) {
       document.getElementById('no-domain-warning').style.display = 'block';
     }
     
-    await loadExistingEmails();
-  } catch (error) {
-    console.error("Error initializing popup:", error);
+    this.currentDomain = await BrowserUtils.getCurrentDomain();
+    await this.loadExistingEmails();
   }
-})();
+
+  showStatus(message, isError = false) {
+    const status = document.getElementById('status');
+    status.textContent = message;
+    status.classList.toggle('error', isError);
+    status.style.opacity = 1;
+    
+    setTimeout(() => {
+      status.style.opacity = 0;
+    }, CONFIG.ANIMATION.NOTIFICATION_DURATION);
+  }
+
+  async handleGenerate() {
+    try {
+      const { [CONFIG.STORAGE_KEYS.CATCH_ALL_DOMAIN]: catchAllDomain } = 
+        await StorageUtils.get(CONFIG.STORAGE_KEYS.CATCH_ALL_DOMAIN);
+      
+      if (!catchAllDomain) {
+        document.getElementById('generated').textContent = "No domain configured";
+        this.showStatus("Please configure a catch-all domain in settings", true);
+        return;
+      }
+
+      const generatedEmail = await EmailGenerator.generate(catchAllDomain);
+      
+      await UsageLogger.log(this.currentDomain, generatedEmail);
+      
+      document.getElementById('generated').textContent = generatedEmail;
+      document.getElementById('copy-container').style.display = 'flex';
+      
+      await this.loadExistingEmails();
+    } catch (error) {
+      console.error("Error generating email:", error);
+      this.showStatus("Error generating email", true);
+    }
+  }
+
+  async handleCopy() {
+    const emailText = document.getElementById('generated').textContent;
+    if (!emailText) return;
+    
+    const success = await UIUtils.copyToClipboard(emailText);
+    this.showStatus(success ? "Copied to clipboard!" : "Failed to copy", !success);
+  }
+
+  async handleFillForms() {
+    try {
+      const { [CONFIG.STORAGE_KEYS.CATCH_ALL_DOMAIN]: catchAllDomain } = 
+        await StorageUtils.get(CONFIG.STORAGE_KEYS.CATCH_ALL_DOMAIN);
+      
+      if (!catchAllDomain) {
+        this.showStatus("No domain configured", true);
+        return;
+      }
+      
+      const tab = await BrowserUtils.getCurrentTab();
+      const generatedEmail = await EmailGenerator.generate(catchAllDomain);
+      
+      const results = await BrowserUtils.executeScript(tab.id, 
+        this.generateFillFormsScript(generatedEmail)
+      );
+      
+      const { filledCount, generatedEmail: resultEmail, domain } = results[0];
+      
+      if (filledCount > 0) {
+        this.showStatus(`Filled ${filledCount} email field(s)`);
+        await UsageLogger.log(domain, resultEmail);
+        await this.loadExistingEmails();
+      } else {
+        this.showStatus("No empty email fields found");
+      }
+    } catch (error) {
+      console.error("Error filling forms:", error);
+      this.showStatus("Error filling forms", true);
+    }
+  }
+
+  generateFillFormsScript(generatedEmail) {
+    return `
+      (async function() {
+        const generatedEmail = "${generatedEmail}";
+        const domain = window.location.hostname;
+        
+        const emailFields = document.querySelectorAll('${CONFIG.SELECTORS.EMAIL_INPUTS}');
+        let filledCount = 0;
+        
+        for (const field of emailFields) {
+          if (!field.value && !field.dataset.noCatchAllFill) {
+            field.value = generatedEmail;
+            field.dispatchEvent(new Event('input', { bubbles: true }));
+            field.dispatchEvent(new Event('change', { bubbles: true }));
+            filledCount++;
+          }
+        }
+        
+        return { filledCount, generatedEmail, domain };
+      })()
+    `;
+  }
+
+  async loadExistingEmails() {
+    try {
+      const usageLog = await UsageLogger.getLog();
+      const domainEmails = usageLog.filter(entry => entry.domain === this.currentDomain);
+      
+      const ul = document.getElementById('existing');
+      ul.innerHTML = '';
+      
+      if (domainEmails.length === 0) {
+        this.renderEmptyEmailList(ul);
+        return;
+      }
+      
+      this.renderEmailList(ul, domainEmails.slice(-10).reverse());
+    } catch (error) {
+      console.error("Error loading emails:", error);
+    }
+  }
+
+  renderEmptyEmailList(container) {
+    const li = document.createElement('li');
+    li.textContent = "No emails generated yet";
+    li.style.color = "#777";
+    container.appendChild(li);
+  }
+
+  renderEmailList(container, emails) {
+    emails.forEach(entry => {
+      const li = document.createElement('li');
+      
+      const emailSpan = document.createElement('span');
+      emailSpan.textContent = entry.generatedEmail;
+      li.appendChild(emailSpan);
+      
+      const copyIcon = this.createCopyIcon(entry.generatedEmail);
+      li.appendChild(copyIcon);
+      
+      container.appendChild(li);
+    });
+  }
+
+  createCopyIcon(email) {
+    const copyIcon = document.createElement('span');
+    copyIcon.textContent = CONFIG.ICON.COPY_EMOJI;
+    copyIcon.title = "Copy to clipboard";
+    copyIcon.className = "copy-icon";
+    copyIcon.addEventListener('click', async () => {
+      const success = await UIUtils.copyToClipboard(email);
+      this.showStatus(success ? "Copied to clipboard!" : "Failed to copy", !success);
+    });
+    return copyIcon;
+  }
+
+  handleOpenOptions(e) {
+    e.preventDefault();
+    browser.runtime.openOptionsPage();
+  }
+}
+
+// Initialize popup controller
+new PopupController();
