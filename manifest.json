@@ -1,7 +1,7 @@
 {
   "manifest_version": 2,
   "name": "Catch-All Email Autofill",
-  "version": "1.4",
+  "version": "1.0",
   "description": "Generate and autofill unique disposable emails using your own catch-all domain",
   "permissions": [
     "storage",
@@ -18,9 +18,7 @@
       "32": "icons/icon-32.png",
       "48": "icons/icon-48.png",
       "96": "icons/icon-96.png",
-      "128": "icons/icon-128.png",
-      "256": "icons/icon-256.png",
-      "512": "icons/icon-512.png"
+      "128": "icons/icon-128.png"
     }
   },
   "background": {
@@ -40,9 +38,7 @@
     "32": "icons/icon-32.png",
     "48": "icons/icon-48.png",
     "96": "icons/icon-96.png",
-    "128": "icons/icon-128.png",
-    "256": "icons/icon-256.png",
-    "512": "icons/icon-512.png"
+    "128": "icons/icon-128.png"
   },
   "options_ui": {
     "page": "options.html",
@@ -55,7 +51,11 @@
     }
   },
   "web_accessible_resources": [
-    "icons/*",
+    "icons/icon-16.png",
+    "icons/icon-32.png",
+    "icons/icon-48.png",
+    "icons/icon-96.png",
+    "icons/icon-128.png",
     "styles.css",
     "css/fontawesome.min.css",
     "css/solid.min.css",
