@@ -32,16 +32,16 @@ class BackgroundController {
 
     try {
       const catchAllDomain = await this.getCatchAllDomain();
-      
+
       if (!catchAllDomain) {
         await this.showNoDomainNotification();
         browser.runtime.openOptionsPage();
         return;
       }
-      
+
       const generatedEmail = await EmailGenerator.generate(catchAllDomain);
       const success = await this.injectEmailIntoField(tab, generatedEmail);
-      
+
       if (success) {
         await this.logEmailUsage(tab, generatedEmail);
       }
@@ -51,7 +51,7 @@ class BackgroundController {
   }
 
   async getCatchAllDomain() {
-    const { [CONFIG.STORAGE_KEYS.CATCH_ALL_DOMAIN]: catchAllDomain } = 
+    const { [CONFIG.STORAGE_KEYS.CATCH_ALL_DOMAIN]: catchAllDomain } =
       await StorageUtils.get(CONFIG.STORAGE_KEYS.CATCH_ALL_DOMAIN);
     return catchAllDomain;
   }
@@ -67,10 +67,10 @@ class BackgroundController {
 
   async injectEmailIntoField(tab, generatedEmail) {
     try {
-      const results = await BrowserUtils.executeScript(tab.id, 
+      const results = await BrowserUtils.executeScript(tab.id,
         this.generateInjectionScript(generatedEmail)
       );
-      
+
       return results[0]?.success || false;
     } catch (error) {
       console.error("Error injecting email:", error);
@@ -134,9 +134,9 @@ class BackgroundController {
 
   async migrateDataIfNeeded() {
     try {
-      const { [CONFIG.STORAGE_KEYS.DATA_VERSION]: dataVersion } = 
+      const { [CONFIG.STORAGE_KEYS.DATA_VERSION]: dataVersion } =
         await StorageUtils.get(CONFIG.STORAGE_KEYS.DATA_VERSION);
-      
+
       if (!dataVersion || dataVersion < CONFIG.DATA_VERSION) {
         await this.performMigration(dataVersion);
         await StorageUtils.set({ [CONFIG.STORAGE_KEYS.DATA_VERSION]: CONFIG.DATA_VERSION });
@@ -154,9 +154,9 @@ class BackgroundController {
   }
 
   async migrateUsageLogFormat() {
-    const { [CONFIG.STORAGE_KEYS.USAGE_LOG]: usageLog = [] } = 
+    const { [CONFIG.STORAGE_KEYS.USAGE_LOG]: usageLog = [] } =
       await StorageUtils.get(CONFIG.STORAGE_KEYS.USAGE_LOG);
-    
+
     let needsMigration = false;
     for (const entry of usageLog) {
       if (!entry.hasOwnProperty('date')) {
@@ -164,14 +164,14 @@ class BackgroundController {
         break;
       }
     }
-    
+
     if (needsMigration) {
       const migratedLog = usageLog.map(entry => ({
         domain: entry.domain || "unknown",
         date: entry.date || new Date().toISOString(),
         generatedEmail: entry.generatedEmail || ""
       }));
-      
+
       await StorageUtils.set({ [CONFIG.STORAGE_KEYS.USAGE_LOG]: migratedLog });
     }
   }

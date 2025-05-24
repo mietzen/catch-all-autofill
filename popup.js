@@ -25,13 +25,13 @@ class PopupController {
   }
 
   async initializeUI() {
-    const { [CONFIG.STORAGE_KEYS.CATCH_ALL_DOMAIN]: catchAllDomain } = 
+    const { [CONFIG.STORAGE_KEYS.CATCH_ALL_DOMAIN]: catchAllDomain } =
       await StorageUtils.get(CONFIG.STORAGE_KEYS.CATCH_ALL_DOMAIN);
-    
+
     if (!catchAllDomain) {
       document.getElementById('no-domain-warning').style.display = 'block';
     }
-    
+
     this.currentDomain = await BrowserUtils.getCurrentDomain();
     await this.loadExistingEmails();
   }
@@ -41,7 +41,7 @@ class PopupController {
     status.textContent = message;
     status.classList.toggle('error', isError);
     status.style.opacity = 1;
-    
+
     setTimeout(() => {
       status.style.opacity = 0;
     }, CONFIG.ANIMATION.NOTIFICATION_DURATION);
@@ -49,9 +49,9 @@ class PopupController {
 
   async handleGenerate() {
     try {
-      const { [CONFIG.STORAGE_KEYS.CATCH_ALL_DOMAIN]: catchAllDomain } = 
+      const { [CONFIG.STORAGE_KEYS.CATCH_ALL_DOMAIN]: catchAllDomain } =
         await StorageUtils.get(CONFIG.STORAGE_KEYS.CATCH_ALL_DOMAIN);
-      
+
       if (!catchAllDomain) {
         document.getElementById('generated').textContent = "No domain configured";
         this.showStatus("Please configure a catch-all domain in settings", true);
@@ -59,12 +59,12 @@ class PopupController {
       }
 
       const generatedEmail = await EmailGenerator.generate(catchAllDomain);
-      
+
       await UsageLogger.log(this.currentDomain, generatedEmail);
-      
+
       document.getElementById('generated').textContent = generatedEmail;
       document.getElementById('copy-container').style.display = 'flex';
-      
+
       await this.loadExistingEmails();
     } catch (error) {
       console.error("Error generating email:", error);
@@ -75,30 +75,30 @@ class PopupController {
   async handleCopy() {
     const emailText = document.getElementById('generated').textContent;
     if (!emailText) return;
-    
+
     const success = await UIUtils.copyToClipboard(emailText);
     this.showStatus(success ? "Copied to clipboard!" : "Failed to copy", !success);
   }
 
   async handleFillForms() {
     try {
-      const { [CONFIG.STORAGE_KEYS.CATCH_ALL_DOMAIN]: catchAllDomain } = 
+      const { [CONFIG.STORAGE_KEYS.CATCH_ALL_DOMAIN]: catchAllDomain } =
         await StorageUtils.get(CONFIG.STORAGE_KEYS.CATCH_ALL_DOMAIN);
-      
+
       if (!catchAllDomain) {
         this.showStatus("No domain configured", true);
         return;
       }
-      
+
       const tab = await BrowserUtils.getCurrentTab();
       const generatedEmail = await EmailGenerator.generate(catchAllDomain);
-      
-      const results = await BrowserUtils.executeScript(tab.id, 
+
+      const results = await BrowserUtils.executeScript(tab.id,
         this.generateFillFormsScript(generatedEmail)
       );
-      
+
       const { filledCount, generatedEmail: resultEmail, domain } = results[0];
-      
+
       if (filledCount > 0) {
         this.showStatus(`Filled ${filledCount} email field(s)`);
         await UsageLogger.log(domain, resultEmail);
@@ -139,15 +139,15 @@ class PopupController {
     try {
       const usageLog = await UsageLogger.getLog();
       const domainEmails = usageLog.filter(entry => entry.domain === this.currentDomain);
-      
+
       const ul = document.getElementById('existing');
       ul.innerHTML = '';
-      
+
       if (domainEmails.length === 0) {
         this.renderEmptyEmailList(ul);
         return;
       }
-      
+
       this.renderEmailList(ul, domainEmails.slice(-10).reverse());
     } catch (error) {
       console.error("Error loading emails:", error);
@@ -164,14 +164,14 @@ class PopupController {
   renderEmailList(container, emails) {
     emails.forEach(entry => {
       const li = document.createElement('li');
-      
+
       const emailSpan = document.createElement('span');
       emailSpan.textContent = entry.generatedEmail;
       li.appendChild(emailSpan);
-      
+
       const copyIcon = this.createCopyIcon(entry.generatedEmail);
       li.appendChild(copyIcon);
-      
+
       container.appendChild(li);
     });
   }

@@ -20,9 +20,10 @@ A Firefox browser extension that generates unique, disposable email addresses us
 You need a **catch-all email** setup on your domain. This means any email sent to `anything@yourdomain.com` will be delivered to your main inbox. Most email providers and hosting services offer this feature.
 
 Make sure you setup:
-   - SPF entry and its parameters as a TXT record in the DNS settings of your provider
-   - DKIM entries as CNAME records in the DNS settings of your provider
-   - DMARC entry and its parameters as a TXT record in the DNS settings of your provider.
+
+- SPF entry and its parameters as a TXT record in the DNS settings of your provider
+- DKIM entries as CNAME records in the DNS settings of your provider
+- DMARC entry and its parameters as a TXT record in the DNS settings of your provider.
 
 Otherwise your domain might be flaged and you wont be able to get mails.
 
@@ -48,15 +49,18 @@ Install directly from the Firefox Add-ons store.
 ## Usage
 
 ### Method 1: Email Field Icons
+
 - Email input fields will automatically show a ✉️ icon
 - Click the icon to generate and fill an email address
 
 ### Method 2: Toolbar Popup
+
 - Click the extension icon in your browser toolbar
 - Click "Generate for this Domain" to create a new email or use a previous generated one
 - Click on the icon to copy the address and paste it into the email field
 
 ### Method 3: Context Menu
+
 - Right-click on any input field
 - Select "Generate Email for this field"
 
@@ -68,7 +72,7 @@ Install directly from the Firefox Add-ons store.
 - Export your email history as JSON or CSV
 - Delete individual entries or clear all history
 
-## Todo:
+## Todo
 
 - Refactoring:
   - Scrap Bulkfill

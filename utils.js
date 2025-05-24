@@ -13,23 +13,23 @@ const StorageUtils = {
   async get(keys) {
     return browser.storage.sync.get(keys);
   },
-  
+
   async set(data) {
     return browser.storage.sync.set(data);
   },
-  
+
   async getLocal(keys) {
     return browser.storage.local.get(keys);
   },
-  
+
   async setLocal(data) {
     return browser.storage.local.set(data);
   },
-  
+
   async removeLocal(keys) {
     return browser.storage.local.remove(keys);
   },
-  
+
   generateCacheKey(url) {
     return `wordlist_${btoa(url).slice(0, 20)}`;
   }
@@ -47,7 +47,7 @@ const WordlistManager = {
     const text = await response.text();
     return this.parseContent(text);
   },
-  
+
   parseContent(content) {
     return content
       .split(/\r?\n/)
@@ -56,17 +56,17 @@ const WordlistManager = {
       .map(line => line.toLowerCase().replace(/[^a-z0-9äöüß]/g, ''))
       .filter(word => word.length >= CONFIG.EMAIL.WORD_MIN_LENGTH);
   },
-  
+
   async load(forceReload = false) {
     try {
-      const { [CONFIG.STORAGE_KEYS.WORDLIST_URL]: wordlistUrl = CONFIG.URLS.DEFAULT_WORDLIST } = 
+      const { [CONFIG.STORAGE_KEYS.WORDLIST_URL]: wordlistUrl = CONFIG.URLS.DEFAULT_WORDLIST } =
         await StorageUtils.get(CONFIG.STORAGE_KEYS.WORDLIST_URL);
-      
+
       // Check cache
       if (!forceReload && cachedWordlist && cachedWordlistUrl === wordlistUrl) {
         return cachedWordlist;
       }
-      
+
       // Try local storage cache
       if (!forceReload) {
         const cacheKey = StorageUtils.generateCacheKey(wordlistUrl);
@@ -77,19 +77,19 @@ const WordlistManager = {
           return cachedWordlist;
         }
       }
-      
+
       // Fetch from URL
       const wordlist = await this.fetchFromUrl(wordlistUrl);
-      
+
       if (wordlist.length < CONFIG.EMAIL.MIN_WORDLIST_SIZE) {
         throw new Error(`Wordlist too small (less than ${CONFIG.EMAIL.MIN_WORDLIST_SIZE} words)`);
       }
-      
+
       // Cache results
       await this.cacheWordlist(wordlist, wordlistUrl);
-      
+
       return wordlist;
-      
+
     } catch (error) {
       console.warn('Failed to load wordlist from URL, using fallback:', error);
       cachedWordlist = CONFIG.FALLBACK_WORDLIST;
@@ -97,20 +97,20 @@ const WordlistManager = {
       return CONFIG.FALLBACK_WORDLIST;
     }
   },
-  
+
   async cacheWordlist(wordlist, url) {
     cachedWordlist = wordlist;
     cachedWordlistUrl = url;
-    
+
     const cacheKey = StorageUtils.generateCacheKey(url);
     await StorageUtils.setLocal({ [cacheKey]: wordlist });
   },
-  
+
   clearCache() {
     cachedWordlist = null;
     cachedWordlistUrl = null;
   },
-  
+
   async clearLocalCache() {
     const storage = await StorageUtils.getLocal(null);
     const keysToRemove = Object.keys(storage).filter(key => key.startsWith('wordlist_'));
@@ -127,11 +127,11 @@ const EmailGenerator = {
   pickRandom(arr) {
     return arr[Math.floor(Math.random() * arr.length)];
   },
-  
+
   generateDigits() {
     return Math.floor(CONFIG.EMAIL.MIN_DIGITS + Math.random() * CONFIG.EMAIL.MAX_DIGITS);
   },
-  
+
   async generate(catchAllDomain) {
     const wordlist = await WordlistManager.load();
     const w1 = this.pickRandom(wordlist);
@@ -147,27 +147,27 @@ const EmailGenerator = {
 const UsageLogger = {
   async log(domain, generatedEmail) {
     const date = new Date().toISOString();
-    const { [CONFIG.STORAGE_KEYS.USAGE_LOG]: usageLog = [] } = 
+    const { [CONFIG.STORAGE_KEYS.USAGE_LOG]: usageLog = [] } =
       await StorageUtils.get(CONFIG.STORAGE_KEYS.USAGE_LOG);
-    
+
     usageLog.push({ domain, date, generatedEmail });
     return StorageUtils.set({ [CONFIG.STORAGE_KEYS.USAGE_LOG]: usageLog });
   },
-  
+
   async getLog() {
-    const { [CONFIG.STORAGE_KEYS.USAGE_LOG]: usageLog = [] } = 
+    const { [CONFIG.STORAGE_KEYS.USAGE_LOG]: usageLog = [] } =
       await StorageUtils.get(CONFIG.STORAGE_KEYS.USAGE_LOG);
     return usageLog;
   },
-  
+
   async clearLog() {
     return StorageUtils.set({ [CONFIG.STORAGE_KEYS.USAGE_LOG]: [] });
   },
-  
+
   async deleteEntry(entry) {
     const usageLog = await this.getLog();
-    const newLog = usageLog.filter(e => 
-      e.generatedEmail !== entry.generatedEmail || 
+    const newLog = usageLog.filter(e =>
+      e.generatedEmail !== entry.generatedEmail ||
       e.domain !== entry.domain ||
       e.date !== entry.date
     );
@@ -195,7 +195,7 @@ const UIUtils = {
       return result;
     }
   },
-  
+
   downloadFile(data, filename, type) {
     const blob = new Blob([data], { type });
     const url = URL.createObjectURL(blob);
@@ -205,7 +205,7 @@ const UIUtils = {
     a.click();
     URL.revokeObjectURL(url);
   },
-  
+
   showNotification(message, isError = false, container = document.body) {
     // Remove existing notification
     const existing = container.querySelector(`.${CONFIG.CSS_CLASSES.NOTIFICATION}`);
@@ -231,15 +231,15 @@ const UIUtils = {
       transition: all 0.3s ease;
       transform: translateX(100%);
     `;
-    
+
     notification.textContent = message;
     container.appendChild(notification);
-    
+
     // Animate in
     requestAnimationFrame(() => {
       notification.style.transform = 'translateX(0)';
     });
-    
+
     // Remove after delay
     setTimeout(() => {
       notification.style.transform = 'translateX(100%)';
@@ -260,12 +260,12 @@ const BrowserUtils = {
     const [tab] = await browser.tabs.query({ active: true, currentWindow: true });
     return tab;
   },
-  
+
   async getCurrentDomain() {
     const tab = await this.getCurrentTab();
     return new URL(tab.url).hostname;
   },
-  
+
   async executeScript(tabId, code) {
     return browser.tabs.executeScript(tabId, { code });
   }
@@ -278,7 +278,7 @@ const ValidationUtils = {
   isValidDomain(domain) {
     return CONFIG.VALIDATION.DOMAIN_REGEX.test(domain);
   },
-  
+
   isValidUrl(url) {
     try {
       new URL(url);
@@ -287,12 +287,12 @@ const ValidationUtils = {
       return false;
     }
   },
-  
+
   isFieldSuitableForIcon(field) {
-    return field.offsetWidth >= CONFIG.VALIDATION.MIN_FIELD_WIDTH && 
-           field.offsetHeight >= CONFIG.VALIDATION.MIN_FIELD_HEIGHT;
+    return field.offsetWidth >= CONFIG.VALIDATION.MIN_FIELD_WIDTH &&
+      field.offsetHeight >= CONFIG.VALIDATION.MIN_FIELD_HEIGHT;
   },
-  
+
   isFieldInPasswordManager(field) {
     return field.closest(CONFIG.SELECTORS.PASSWORD_MANAGER_EXCLUSIONS);
   }
@@ -307,22 +307,22 @@ const ExportUtils = {
     if (usageLog.length === 0) {
       throw new Error('No data to export');
     }
-    
+
     const data = JSON.stringify(usageLog, null, 2);
     const filename = `email_log_${new Date().toISOString().slice(0, 10)}.json`;
     UIUtils.downloadFile(data, filename, 'application/json');
   },
-  
+
   async exportAsCsv() {
     const usageLog = await UsageLogger.getLog();
     if (usageLog.length === 0) {
       throw new Error('No data to export');
     }
-    
+
     const headers = "email,domain,date\n";
-    const csvContent = headers + 
+    const csvContent = headers +
       usageLog.map(e => `"${e.generatedEmail}","${e.domain}","${e.date}"`).join('\n');
-    
+
     const filename = `email_log_${new Date().toISOString().slice(0, 10)}.csv`;
     UIUtils.downloadFile(csvContent, filename, 'text/csv');
   }

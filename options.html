@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html>
+
 <head>
   <meta charset="UTF-8">
   <title>Catch-All Email Autofill Settings</title>
@@ -7,24 +8,26 @@
   <link rel="stylesheet" href="css/solid.min.css">
   <link rel="stylesheet" href="styles.css">
 </head>
+
 <body class="options-body">
   <h1>Catch-All Email Autofill Settings</h1>
-  
+
   <div class="card">
     <h2 class="options-h2">Set Your Catch-All Domain</h2>
     <p>Enter your catch-all email domain below. This domain will be used to generate unique email addresses.</p>
-    <p class="text-muted">Make sure you have catch-all email set up for this domain, or emails sent to the generated addresses won't be received.</p>
-    
+    <p class="text-muted">Make sure you have catch-all email set up for this domain, or emails sent to the generated
+      addresses won't be received.</p>
+
     <div class="form-group">
       <label for="domain">Catch-All Domain:</label>
       <input type="text" id="domain" class="options-input" placeholder="yourdomain.com">
       <p class="text-muted">Don't include the @ symbol. Example: "mydomain.com"</p>
     </div>
-    
+
     <div class="example">
       Generated address example: <span id="example-email">word_word_123@yourdomain.com</span>
     </div>
-    
+
     <button id="save">Save Domain</button>
     <div id="status"></div>
   </div>
@@ -32,32 +35,33 @@
   <div class="card">
     <h2 class="options-h2">Wordlist Configuration</h2>
     <p>Configure the URL to load words from for generating email addresses.</p>
-    
+
     <div class="wordlist-info">
       <strong>Current wordlist:</strong> <span id="wordlist-status">Loading...</span><br>
       <strong>Words preview:</strong> <span id="wordlist-preview">Loading...</span>
     </div>
-    
+
     <div class="form-group">
       <label for="wordlist-url">Wordlist URL:</label>
       <input type="url" id="wordlist-url" class="options-input" placeholder="https://example.com/wordlist.txt">
-      <p class="text-muted">URL should point to a text file with one word per line. Default uses German diceware wordlist.</p>
+      <p class="text-muted">URL should point to a text file with one word per line. Default uses German diceware
+        wordlist.</p>
     </div>
-    
+
     <div class="button-row">
       <button id="save-wordlist-url">Save URL</button>
       <button id="reset-wordlist-url" class="secondary">Reset to Default</button>
       <button id="reload-wordlist" class="secondary"><i class="fas fa-sync-alt"></i> Reload</button>
     </div>
   </div>
-  
+
   <h2 class="options-h2">Generated Email Addresses</h2>
-  
+
   <div class="button-row">
     <button id="download-json" class="secondary">Export as JSON</button>
     <button id="download-csv" class="secondary">Export as CSV</button>
   </div>
-  
+
   <div class="log-container">
     <div class="log-filters">
       <input type="text" id="filter-domain" placeholder="Filter by domain...">
@@ -75,16 +79,17 @@
       <tbody id="log"></tbody>
     </table>
   </div>
-  
+
   <div class="danger-zone">
     <h3>Danger Zone</h3>
     <p>These actions cannot be undone. Be careful!</p>
     <button id="clear-history" class="danger-button">Clear All History</button>
   </div>
-  
+
   <script src="config.js"></script>
   <script src="browser-polyfill.js"></script>
   <script src="utils.js"></script>
   <script src="options.js"></script>
 </body>
+
 </html>

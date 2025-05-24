@@ -17,7 +17,7 @@ class EmailFieldProcessor {
       link.rel = 'stylesheet';
       link.href = browser.runtime.getURL('css/fontawesome.min.css');
       document.head.appendChild(link);
-      
+
       const solidLink = document.createElement('link');
       solidLink.rel = 'stylesheet';
       solidLink.href = browser.runtime.getURL('css/solid.min.css');
@@ -27,9 +27,9 @@ class EmailFieldProcessor {
 
   async init() {
     try {
-      const { [CONFIG.STORAGE_KEYS.CATCH_ALL_DOMAIN]: catchAllDomain } = 
+      const { [CONFIG.STORAGE_KEYS.CATCH_ALL_DOMAIN]: catchAllDomain } =
         await StorageUtils.get(CONFIG.STORAGE_KEYS.CATCH_ALL_DOMAIN);
-      
+
       if (!catchAllDomain) return;
 
       this.initializeObserver();
@@ -63,8 +63,8 @@ class EmailFieldProcessor {
   }
 
   processFieldsInNode(node) {
-    const emailFields = node.querySelectorAll ? 
-      node.querySelectorAll(CONFIG.SELECTORS.EMAIL_INPUTS) : 
+    const emailFields = node.querySelectorAll ?
+      node.querySelectorAll(CONFIG.SELECTORS.EMAIL_INPUTS) :
       (node.type === 'email' && node.tagName === 'INPUT' ? [node] : []);
 
     for (const field of emailFields) {
@@ -82,15 +82,15 @@ class EmailFieldProcessor {
 
     const wrapper = this.createOrGetWrapper(emailField);
     const icon = this.createIcon(emailField);
-    
+
     this.adjustFieldPadding(emailField);
     wrapper.appendChild(icon);
     this.setupFieldEventListeners(emailField, icon, wrapper);
   }
 
   shouldProcessField(field) {
-    return ValidationUtils.isFieldSuitableForIcon(field) && 
-           !ValidationUtils.isFieldInPasswordManager(field);
+    return ValidationUtils.isFieldSuitableForIcon(field) &&
+      !ValidationUtils.isFieldInPasswordManager(field);
   }
 
   createOrGetWrapper(emailField) {
@@ -103,7 +103,7 @@ class EmailFieldProcessor {
         display: inline-block;
         width: 100%;
       `;
-      
+
       emailField.parentNode.insertBefore(wrapper, emailField);
       wrapper.appendChild(emailField);
     }
@@ -115,10 +115,10 @@ class EmailFieldProcessor {
     icon.className = CONFIG.CSS_CLASSES.ICON;
     icon.innerHTML = CONFIG.ICON.MAIL_GLYPH;
     icon.title = 'Generate catch-all email';
-    
+
     this.styleIcon(icon);
     this.setupIconEventListeners(icon, emailField);
-    
+
     return icon;
   }
 
@@ -161,26 +161,26 @@ class EmailFieldProcessor {
   async handleIconClick(e, icon, emailField) {
     e.preventDefault();
     e.stopPropagation();
-    
+
     try {
-      const { [CONFIG.STORAGE_KEYS.CATCH_ALL_DOMAIN]: catchAllDomain } = 
+      const { [CONFIG.STORAGE_KEYS.CATCH_ALL_DOMAIN]: catchAllDomain } =
         await StorageUtils.get(CONFIG.STORAGE_KEYS.CATCH_ALL_DOMAIN);
-      
+
       if (!catchAllDomain) {
         UIUtils.showNotification('No catch-all domain configured. Please set one in the extension settings.', true);
         return;
       }
 
       const generatedEmail = await EmailGenerator.generate(catchAllDomain);
-      
+
       this.fillEmailField(emailField, generatedEmail);
-      
+
       const domain = window.location.hostname;
       await UsageLogger.log(domain, generatedEmail);
-      
+
       UIUtils.showNotification(`Generated email: ${generatedEmail}`);
       this.showSuccessFeedback(icon);
-      
+
     } catch (error) {
       console.error('Error generating email:', error);
       UIUtils.showNotification('Error generating email', true);
@@ -190,7 +190,7 @@ class EmailFieldProcessor {
   fillEmailField(emailField, email) {
     emailField.value = email;
     emailField.focus();
-    
+
     // Trigger events for form validation
     emailField.dispatchEvent(new Event('input', { bubbles: true }));
     emailField.dispatchEvent(new Event('change', { bubbles: true }));
@@ -199,10 +199,10 @@ class EmailFieldProcessor {
   showSuccessFeedback(icon) {
     const originalBg = icon.style.background;
     const originalContent = icon.innerHTML;
-    
+
     icon.style.background = '#4CAF50';
     icon.innerHTML = CONFIG.ICON.SUCCESS_GLYPH;
-    
+
     setTimeout(() => {
       icon.style.background = originalBg;
       icon.innerHTML = originalContent;

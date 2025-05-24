@@ -44,14 +44,16 @@ button.danger-button:hover {
   background-color: #b5001b;
 }
 
-input[type="text"], input[type="url"] {
+input[type="text"],
+input[type="url"] {
   padding: 8px;
   border: 1px solid #b1b1b3;
   border-radius: 2px;
   font-size: 15px;
 }
 
-input[type="text"]:focus, input[type="url"]:focus {
+input[type="text"]:focus,
+input[type="url"]:focus {
   border-color: #0a84ff;
   box-shadow: 0 0 0 1px #0a84ff;
   outline: none;

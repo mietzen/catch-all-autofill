@@ -22,13 +22,25 @@
     }
   },
   "background": {
-    "scripts": ["config.js", "browser-polyfill.js", "utils.js", "background.js"],
+    "scripts": [
+      "config.js",
+      "browser-polyfill.js",
+      "utils.js",
+      "background.js"
+    ],
     "persistent": false
   },
   "content_scripts": [
     {
-      "matches": ["<all_urls>"],
-      "js": ["config.js", "browser-polyfill.js", "utils.js", "content.js"],
+      "matches": [
+        "<all_urls>"
+      ],
+      "js": [
+        "config.js",
+        "browser-polyfill.js",
+        "utils.js",
+        "content.js"
+      ],
       "run_at": "document_idle",
       "all_frames": true
     }
