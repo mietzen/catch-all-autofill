@@ -307,7 +307,7 @@ class OptionsController {
     
     // Copy button
     const copyButton = this.createActionButton(
-      CONFIG.ICON.COPY_EMOJI, 
+      CONFIG.ICON.COPY_GLYPH, 
       'Copy email',
       async () => {
         const success = await UIUtils.copyToClipboard(entry.generatedEmail);
@@ -318,7 +318,7 @@ class OptionsController {
     
     // Delete button
     const deleteButton = this.createActionButton(
-      CONFIG.ICON.DELETE_EMOJI,
+      CONFIG.ICON.DELETE_GLYPH,
       'Delete entry',
       () => this.handleDeleteEntry(entry)
     );

@@ -10,10 +10,10 @@ const CONFIG = {
   ICON: {
     SIZE: 20,
     PADDING: 5,
-    EMOJI: '📧',
+    MAIL_EMOJI: '📧',
     SUCCESS_EMOJI: '✓',
-    COPY_EMOJI: '<i class="fas fa-copy"></i>',
-    DELETE_EMOJI: '<i class="fas fa-trash"></i>'
+    COPY_GLYPH: '<i class="fas fa-copy"></i>',
+    DELETE_GLYPH: '<i class="fas fa-trash"></i>'
   },
   
   // Animation and timing
@@ -33,7 +33,7 @@ const CONFIG = {
   
   // URLs
   URLS: {
-    DEFAULT_WORDLIST: 'https://raw.githubusercontent.com/dys2p/wordlists-de/refs/heads/main/de-7776-v1.txt'
+    DEFAULT_WORDLIST: 'https://raw.githubusercontent.com/dys2p/wordlists-de/refs/heads/main/eff_large_wordlist.txt'
   },
   
   // Storage keys

@@ -96,7 +96,7 @@ class EmailFieldProcessor {
   createIcon(emailField) {
     const icon = document.createElement('div');
     icon.className = CONFIG.CSS_CLASSES.ICON;
-    icon.innerHTML = CONFIG.ICON.EMOJI;
+    icon.innerHTML = CONFIG.ICON.MAIL_EMOJI;
     icon.title = 'Generate catch-all email';
     
     this.styleIcon(icon);

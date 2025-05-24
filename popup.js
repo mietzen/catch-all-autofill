@@ -178,7 +178,7 @@ class PopupController {
 
   createCopyIcon(email) {
     const copyIcon = document.createElement('span');
-    copyIcon.innerHTML = CONFIG.ICON.COPY_EMOJI;
+    copyIcon.innerHTML = CONFIG.ICON.COPY_GLYPH;
     copyIcon.title = "Copy to clipboard";
     copyIcon.className = "copy-icon";
     copyIcon.addEventListener('click', async () => {
