@@ -10,8 +10,8 @@ const CONFIG = {
   ICON: {
     SIZE: 20,
     PADDING: 5,
-    MAIL_EMOJI: '📧',
-    SUCCESS_EMOJI: '✓',
+    MAIL_GLYPH: '<i class="fas fa-envelope"></i>',
+    SUCCESS_GLYPH: '<i class="fas fa-check"></i>',
     COPY_GLYPH: '<i class="fas fa-copy"></i>',
     DELETE_GLYPH: '<i class="fas fa-trash"></i>'
   },

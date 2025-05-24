@@ -327,10 +327,10 @@ class OptionsController {
     return actionsCell;
   }
 
-  createActionButton(emoji, title, onClick) {
+  createActionButton(glyph, title, onClick) {
     const button = document.createElement('button');
     button.className = 'icon-button';
-    button.innerHTML = emoji;
+    button.innerHTML = glyph;
     button.title = title;
     button.addEventListener('click', onClick);
     return button;

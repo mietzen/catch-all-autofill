@@ -2,10 +2,27 @@
  * Refactored content script that runs on webpages to inject icons into email fields
  */
 
+
 class EmailFieldProcessor {
   constructor() {
     this.processedFields = new WeakSet();
+    this.injectFontAwesome(); // Add this line
     this.init();
+  }
+
+  injectFontAwesome() {
+    if (!document.getElementById('catch-all-fa-css')) {
+      const link = document.createElement('link');
+      link.id = 'catch-all-fa-css';
+      link.rel = 'stylesheet';
+      link.href = browser.runtime.getURL('css/fontawesome.min.css');
+      document.head.appendChild(link);
+      
+      const solidLink = document.createElement('link');
+      solidLink.rel = 'stylesheet';
+      solidLink.href = browser.runtime.getURL('css/solid.min.css');
+      document.head.appendChild(solidLink);
+    }
   }
 
   async init() {
@@ -96,7 +113,7 @@ class EmailFieldProcessor {
   createIcon(emailField) {
     const icon = document.createElement('div');
     icon.className = CONFIG.CSS_CLASSES.ICON;
-    icon.innerHTML = CONFIG.ICON.MAIL_EMOJI;
+    icon.innerHTML = CONFIG.ICON.MAIL_GLYPH;
     icon.title = 'Generate catch-all email';
     
     this.styleIcon(icon);
@@ -184,7 +201,7 @@ class EmailFieldProcessor {
     const originalContent = icon.innerHTML;
     
     icon.style.background = '#4CAF50';
-    icon.innerHTML = CONFIG.ICON.SUCCESS_EMOJI;
+    icon.innerHTML = CONFIG.ICON.SUCCESS_GLYPH;
     
     setTimeout(() => {
       icon.style.background = originalBg;
