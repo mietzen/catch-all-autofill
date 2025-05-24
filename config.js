@@ -33,7 +33,7 @@ const CONFIG = {
   
   // URLs
   URLS: {
-    DEFAULT_WORDLIST: 'https://raw.githubusercontent.com/dys2p/wordlists-de/refs/heads/main/eff_large_wordlist.txt'
+    DEFAULT_WORDLIST: 'https://raw.githubusercontent.com/mietzen/catch-all-autofill/refs/heads/main/wordlists/eff_large_wordlist.txt'
   },
   
   // Storage keys
