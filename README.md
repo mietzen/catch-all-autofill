@@ -76,6 +76,5 @@ Install directly from the Firefox Add-ons store.
 - Upload to Stores
 - CI/CD
 - Refactoring (Duplication, hardcoded stuff, etc.)
-- Check if E-Mail is valid
-- Generation options (1-x Words / digits / separator char)
+- Check if E-Mail is valid or collides with existing
 - Screenshots / screencasts
