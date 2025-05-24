@@ -70,9 +70,15 @@ Install directly from the Firefox Add-ons store.
 
 ## Todo:
 
+- Refactoring:
+  - Scrap Bulkfill
+  - Scrap csv export
+  - Folder structure
+- Json import
+- Check if E-Mail is valid or collides with existing
+- Github backup / Restore option
+- Screenshots / screencasts
 - Port to Chrome
 - Test Sync
 - Upload to Stores
 - CI/CD
-- Check if E-Mail is valid or collides with existing
-- Screenshots / screencasts
