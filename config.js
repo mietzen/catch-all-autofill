@@ -12,8 +12,8 @@ const CONFIG = {
     PADDING: 5,
     EMOJI: '📧',
     SUCCESS_EMOJI: '✓',
-    COPY_EMOJI: '📋',
-    DELETE_EMOJI: '🗑️'
+    COPY_EMOJI: '<i class="fas fa-copy"></i>',
+    DELETE_EMOJI: '<i class="fas fa-trash"></i>'
   },
   
   // Animation and timing

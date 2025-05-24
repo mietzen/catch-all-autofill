@@ -330,7 +330,7 @@ class OptionsController {
   createActionButton(emoji, title, onClick) {
     const button = document.createElement('button');
     button.className = 'icon-button';
-    button.textContent = emoji;
+    button.innerHTML = emoji;
     button.title = title;
     button.addEventListener('click', onClick);
     return button;

@@ -71,10 +71,8 @@ Install directly from the Firefox Add-ons store.
 ## Todo:
 
 - Port to Chrome
-- Use Font Awesome instead of emoji
 - Test Sync
 - Upload to Stores
 - CI/CD
-- Refactoring (Duplication, hardcoded stuff, etc.)
 - Check if E-Mail is valid or collides with existing
 - Screenshots / screencasts
