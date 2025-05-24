@@ -42,8 +42,6 @@ const CONFIG = {
     WORDLIST_URL: 'wordlistUrl',
     USAGE_LOG: 'usageLog',
     DATA_VERSION: 'dataVersion',
-    CUSTOM_WORDLIST: 'customWordlist',
-    USE_CUSTOM_WORDLIST: 'useCustomWordlist'
   },
 
   // Validation
