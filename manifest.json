@@ -5,12 +5,10 @@
   "description": "Generate and autofill unique disposable emails using your own catch-all domain",
   "permissions": [
     "storage",
-    "tabs",
     "activeTab",
     "clipboardWrite",
     "notifications",
-    "contextMenus",
-    "<all_urls>"
+    "contextMenus"
   ],
   "browser_action": {
     "default_popup": "popup.html",
@@ -19,17 +17,20 @@
       "16": "icons/icon-16.png",
       "32": "icons/icon-32.png",
       "48": "icons/icon-48.png",
-      "96": "icons/icon-96.png"
+      "96": "icons/icon-96.png",
+      "128": "icons/icon-128.png",
+      "256": "icons/icon-256.png",
+      "512": "icons/icon-512.png"
     }
   },
   "background": {
-    "scripts": ["browser-polyfill.js", "utils.js", "background.js"],
+    "scripts": ["config.js", "browser-polyfill.js", "utils.js", "background.js"],
     "persistent": false
   },
   "content_scripts": [
     {
       "matches": ["<all_urls>"],
-      "js": ["browser-polyfill.js", "content.js"],
+      "js": ["config.js", "browser-polyfill.js", "utils.js", "content.js"],
       "run_at": "document_idle",
       "all_frames": true
     }
@@ -54,6 +55,7 @@
     }
   },
   "web_accessible_resources": [
-    "icons/*"
+    "icons/*",
+    "styles.css"
   ]
 }

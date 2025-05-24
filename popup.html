@@ -2,118 +2,9 @@
 <html>
 <head>
   <meta charset="UTF-8">
-  <style>
-    body {
-      min-width: 320px;
-      font-family: system-ui, -apple-system, sans-serif;
-      padding: 12px;
-      margin: 0;
-      color: #333;
-    }
-    .header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-bottom: 12px;
-    }
-    .header h3 {
-      margin: 0;
-      font-size: 16px;
-    }
-    .settings-link {
-      font-size: 12px;
-      color: #0060df;
-      text-decoration: none;
-    }
-    button {
-      background-color: #0060df;
-      color: white;
-      border: none;
-      border-radius: 4px;
-      padding: 8px 12px;
-      font-size: 14px;
-      cursor: pointer;
-      margin-bottom: 12px;
-      transition: background-color 0.2s;
-    }
-    button:hover {
-      background-color: #004eb8;
-    }
-    button:disabled {
-      background-color: #b1b1b3;
-      cursor: not-allowed;
-    }
-    .button-group {
-      display: flex;
-      gap: 8px;
-    }
-    #generated {
-      background-color: #f9f9fa;
-      padding: 8px;
-      border-radius: 4px;
-      font-family: monospace;
-      word-break: break-all;
-      margin-bottom: 16px;
-      min-height: 18px;
-    }
-    .copy-button {
-      background-color: #38383d;
-      font-size: 12px;
-      padding: 4px 8px;
-    }
-    h4 {
-      font-size: 14px;
-      margin: 16px 0 8px 0;
-      color: #5e5e72;
-    }
-    #existing {
-      list-style: none;
-      padding: 0;
-      margin: 0;
-      font-family: monospace;
-      font-size: 12px;
-      max-height: 150px;
-      overflow-y: auto;
-    }
-    #existing li {
-      padding: 6px 8px;
-      border-bottom: 1px solid #ededf0;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-    #existing li:last-child {
-      border-bottom: none;
-    }
-    .copy-icon {
-      cursor: pointer;
-      opacity: 0.6;
-      padding: 4px;
-    }
-    .copy-icon:hover {
-      opacity: 1;
-    }
-    .status {
-      font-size: 12px;
-      color: #008000;
-      margin-top: 4px;
-      height: 16px;
-      transition: opacity 0.5s;
-    }
-    .error {
-      color: #d70022;
-    }
-    .no-domain-warning {
-      color: #d70022;
-      font-size: 13px;
-      padding: 8px;
-      background-color: #fdf2f5;
-      border-radius: 4px;
-      margin-bottom: 12px;
-    }
-  </style>
+  <link rel="stylesheet" href="styles.css">
 </head>
-<body>
+<body class="popup-body">
   <div class="header">
     <h3>Generate Email</h3>
     <a href="#" id="open-options" class="settings-link">⚙️ Settings</a>
@@ -124,8 +15,8 @@
   </div>
   
   <div class="button-group">
-    <button id="generate">Generate for this Domain</button>
-    <button id="fill-forms" title="Fill all empty email fields on this page">Fill Forms</button>
+    <button id="generate" class="popup-button">Generate for this Domain</button>
+    <button id="fill-forms" class="popup-button" title="Fill all empty email fields on this page">Fill Forms</button>
   </div>
   
   <div id="generated"></div>
@@ -134,9 +25,10 @@
   </div>
   <div id="status" class="status"></div>
   
-  <h4>Generated for this Domain:</h4>
+  <h4 class="popup-h4">Generated for this Domain:</h4>
   <ul id="existing"></ul>
-  
+
+  <script src="config.js"></script>
   <script src="browser-polyfill.js"></script>
   <script src="utils.js"></script>
   <script src="popup.js"></script>
