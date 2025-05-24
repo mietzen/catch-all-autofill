@@ -86,9 +86,16 @@ Install directly from the Firefox Add-ons store.
     - PASSWORD_MANAGER_EXCLUSIONS
     - EMAIL.MIN_DIGITS EMAIL.MAX_DIGITS EMAIL.MIN_WORDLIST_SIZE EMAIL.WORD_MIN_LENGTH
   - In background.js handleMessage has input sender, which is unused
-- Json import
+- Detect more Input fields, e.g. type/name: user/username/account/email/acc
 - Check if E-Mail is valid or collides with existing
-- Github backup / Restore option
+- Json export should save all settings!
+- Json import
+- Github backup option (Json export) <https://stackoverflow.com/a/69290756/6847446> (GraphQL)
+
+  Settings:
+  - branch (default: main)
+  - repository (name with owner, e.g.: demo-githubs/test)
+  - PAT
 - Screenshots / screencasts
 - Port to Chrome
 - Test Sync
