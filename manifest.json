@@ -23,10 +23,10 @@
   },
   "background": {
     "scripts": [
-      "config.js",
-      "browser-polyfill.js",
-      "utils.js",
-      "background.js"
+      "js/config.js",
+      "js/browser-polyfill.js",
+      "js/utils.js",
+      "js/background.js"
     ],
     "persistent": false
   },
@@ -36,10 +36,10 @@
         "<all_urls>"
       ],
       "js": [
-        "config.js",
-        "browser-polyfill.js",
-        "utils.js",
-        "content.js"
+        "js/config.js",
+        "js/browser-polyfill.js",
+        "js/utils.js",
+        "js/content.js"
       ],
       "run_at": "document_idle",
       "all_frames": true
@@ -68,7 +68,7 @@
     "icons/icon-48.png",
     "icons/icon-96.png",
     "icons/icon-128.png",
-    "styles.css",
+    "css/styles.css",
     "css/fontawesome.min.css",
     "css/solid.min.css",
     "webfonts/fa-solid-900.woff2",

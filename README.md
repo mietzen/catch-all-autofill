@@ -75,17 +75,7 @@ Install directly from the Firefox Add-ons store.
 ## Todo
 
 - Refactoring:
-  - Scrap Bulkfill
-  - Scrap csv export
-  - Do we need / Why do we need:
-    - CUSTOM_WORDLIST and USE_CUSTOM_WORDLIST if we already got WORDLIST_URL
-    - USAGE_LOG
-    - DATA_VERSION
-    - VALIDATION.MIN_FIELD_WIDTH and VALIDATION.MIN_FIELD_HEIGHT
-    - PASSWORD_MANAGER_EXCLUSIONS
-    - EMAIL.MIN_DIGITS EMAIL.MAX_DIGITS EMAIL.MIN_WORDLIST_SIZE EMAIL.WORD_MIN_LENGTH
-  - In background.js handleMessage has input sender, which is unused
-- Folder structure
+  - Folder structure
 - Check if E-Mail is valid or collides with existing
 - Json export should save all settings!
 - Json import
@@ -100,7 +90,6 @@ Install directly from the Firefox Add-ons store.
   - repository (name with owner, e.g.: demo-githubs/test)
   - PAT (Should be excluded from backup!)
 
-- Check font awesome licence
 - Make html nicer
 - Screenshots / screencasts
 - Port to Chrome
