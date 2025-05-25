@@ -11,23 +11,23 @@
     "contextMenus"
   ],
   "browser_action": {
-    "default_popup": "popup.html",
+    "default_popup": "src/html/popup.html",
     "default_title": "Generate Email",
     "default_icon": {
-      "16": "icons/icon-16.png",
-      "32": "icons/icon-32.png",
-      "48": "icons/icon-48.png",
-      "96": "icons/icon-96.png",
-      "128": "icons/icon-128.png"
+      "16": "src/assests/icons/icon-16.png",
+      "32": "src/assests/icons/icon-32.png",
+      "48": "src/assests/icons/icon-48.png",
+      "96": "src/assests/icons/icon-96.png",
+      "128": "src/assests/icons/icon-128.png"
     }
   },
   "background": {
     "scripts": [
-      "js/config.js",
-      "js/browser-polyfill.js",
-      "js/flag-icons.js",
-      "js/utils.js",
-      "js/background.js"
+      "src/js/config.js",
+      "src/js/browser-polyfill.js",
+      "src/js/flag-icons.js",
+      "src/js/utils.js",
+      "src/js/background.js"
     ],
     "persistent": false
   },
@@ -37,25 +37,25 @@
         "<all_urls>"
       ],
       "js": [
-        "js/config.js",
-        "js/browser-polyfill.js",
-        "js/flag-icons.js",
-        "js/utils.js",
-        "js/content.js"
+        "src/js/config.js",
+        "src/js/browser-polyfill.js",
+        "src/js/flag-icons.js",
+        "src/js/utils.js",
+        "src/js/content.js"
       ],
       "run_at": "document_idle",
       "all_frames": true
     }
   ],
   "icons": {
-    "16": "icons/icon-16.png",
-    "32": "icons/icon-32.png",
-    "48": "icons/icon-48.png",
-    "96": "icons/icon-96.png",
-    "128": "icons/icon-128.png"
+    "16": "src/assests/icons/icon-16.png",
+    "32": "src/assests/icons/icon-32.png",
+    "48": "src/assests/icons/icon-48.png",
+    "96": "src/assests/icons/icon-96.png",
+    "128": "src/assests/icons/icon-128.png"
   },
   "options_ui": {
-    "page": "options.html",
+    "page": "src/html/options.html",
     "open_in_tab": true
   },
   "browser_specific_settings": {
@@ -65,17 +65,17 @@
     }
   },
   "web_accessible_resources": [
-    "icons/icon-16.png",
-    "icons/icon-32.png",
-    "icons/icon-48.png",
-    "icons/icon-96.png",
-    "icons/icon-128.png",
-    "css/styles.css",
-    "css/fontawesome.min.css",
-    "css/solid.min.css",
-    "webfonts/fa-solid-900.woff2",
-    "webfonts/fa-solid-900.ttf",
-    "wordlists/*.txt",
-    "flags/*.svg"
+    "src/assests/icons/icon-16.png",
+    "src/assests/icons/icon-32.png",
+    "src/assests/icons/icon-48.png",
+    "src/assests/icons/icon-96.png",
+    "src/assests/icons/icon-128.png",
+    "src/css/styles.css",
+    "src/css/fontawesome.min.css",
+    "src/css/solid.min.css",
+    "src/webfonts/fa-solid-900.woff2",
+    "src/webfonts/fa-solid-900.ttf",
+    "src/assests/wordlists/*.txt",
+    "src/flags/*.svg"
   ]
 }

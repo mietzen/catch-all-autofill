@@ -37,12 +37,12 @@ const CONFIG = {
   WORDLISTS: {
     DEFAULT: 'en',
     AVAILABLE: [
-      { code: 'de', name: 'German', flag: 'DE', file: 'wordlists/de.txt' },
-      { code: 'en', name: 'English', flag: 'US', file: 'wordlists/en.txt' },
-      { code: 'es', name: 'Spanish', flag: 'ES', file: 'wordlists/es.txt' },
-      { code: 'fi', name: 'Finnish', flag: 'FI', file: 'wordlists/fi.txt' },
-      { code: 'fr', name: 'French', flag: 'FR', file: 'wordlists/fr.txt' },
-      { code: 'se', name: 'Swedish', flag: 'SE', file: 'wordlists/se.txt' }
+      { code: 'de', name: 'German', flag: 'DE', file: 'assests/wordlists/de.txt' },
+      { code: 'en', name: 'English', flag: 'US', file: 'assests/wordlists/en.txt' },
+      { code: 'es', name: 'Spanish', flag: 'ES', file: 'assests/wordlists/es.txt' },
+      { code: 'fi', name: 'Finnish', flag: 'FI', file: 'assests/wordlists/fi.txt' },
+      { code: 'fr', name: 'French', flag: 'FR', file: 'assests/wordlists/fr.txt' },
+      { code: 'se', name: 'Swedish', flag: 'SE', file: 'assests/wordlists/se.txt' }
     ],
     CUSTOM_KEY: 'custom'
   },
