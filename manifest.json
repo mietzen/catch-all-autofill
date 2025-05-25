@@ -25,7 +25,6 @@
     "scripts": [
       "src/js/config.js",
       "src/js/browser-polyfill.js",
-      "src/js/flag-icons.js",
       "src/js/utils.js",
       "src/js/background.js"
     ],
@@ -39,7 +38,6 @@
       "js": [
         "src/js/config.js",
         "src/js/browser-polyfill.js",
-        "src/js/flag-icons.js",
         "src/js/utils.js",
         "src/js/content.js"
       ],
