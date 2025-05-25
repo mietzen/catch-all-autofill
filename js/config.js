@@ -33,15 +33,26 @@ const CONFIG = {
     MAX_RETRIES: 10
   },
 
-  // URLs
-  URLS: {
-    DEFAULT_WORDLIST: 'https://raw.githubusercontent.com/mietzen/catch-all-autofill/refs/heads/main/wordlists/eff_large_wordlist.txt'
+  // Wordlist configuration
+  WORDLISTS: {
+    DEFAULT: 'en',
+    AVAILABLE: [
+      { code: 'de', name: 'German', flag: 'DE', file: 'wordlists/de.txt' },
+      { code: 'en', name: 'English', flag: 'US', file: 'wordlists/en.txt' },
+      { code: 'es', name: 'Spanish', flag: 'ES', file: 'wordlists/es.txt' },
+      { code: 'fi', name: 'Finnish', flag: 'FI', file: 'wordlists/fi.txt' },
+      { code: 'fr', name: 'French', flag: 'FR', file: 'wordlists/fr.txt' },
+      { code: 'se', name: 'Swedish', flag: 'SE', file: 'wordlists/se.txt' }
+    ],
+    CUSTOM_KEY: 'custom'
   },
+
 
   // Storage keys
   STORAGE_KEYS: {
     CATCH_ALL_DOMAIN: 'catchAllDomain',
-    WORDLIST_URL: 'wordlistUrl',
+    WORDLIST_SELECTION: 'wordlistSelection', // New: stores 'de', 'en', etc. or 'custom'
+    WORDLIST_URL: 'wordlistUrl', // Only used when selection is 'custom'
     USAGE_LOG: 'usageLog',
     DATA_VERSION: 'dataVersion',
   },
@@ -53,14 +64,6 @@ const CONFIG = {
     DOMAIN_REGEX: /^(?:[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?\.)*[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?\.+[a-zA-Z]{2,}$/
   },
 
-  // Fallback data
-  FALLBACK_WORDLIST: [
-    "apple", "bridge", "candle", "delta", "echo", "forest", "grape",
-    "hotel", "igloo", "jelly", "koala", "lemon", "monkey", "nectar",
-    "omega", "pencil", "quest", "rocket", "sunset", "tiger", "umbrella",
-    "violet", "whale", "xray", "yodel", "zebra"
-  ],
-
   // CSS Classes
   CSS_CLASSES: {
     WRAPPER: 'catch-all-email-extension-wrapper',
@@ -70,8 +73,8 @@ const CONFIG = {
 
   // Selectors
   SELECTORS: {
-  EMAIL_INPUTS: 'input[autocomplete="email"], input[autocomplete="username"], input[id="email"], input[id="username"], input[name="email"], input[name="username"], input[type="email"]',
-  PASSWORD_MANAGER_EXCLUSIONS: '[data-lastpass-icon-root], [data-1password-icon]'
+    EMAIL_INPUTS: 'input[autocomplete="email"], input[autocomplete="username"], input[id="email"], input[id="username"], input[name="email"], input[name="username"], input[type="email"]',
+    PASSWORD_MANAGER_EXCLUSIONS: '[data-lastpass-icon-root], [data-1password-icon]'
   }
 };
 

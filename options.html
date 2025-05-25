@@ -34,7 +34,7 @@
 
   <div class="card">
     <h2 class="options-h2">Wordlist Configuration</h2>
-    <p>Configure the URL to load words from for generating email addresses.</p>
+    <p>Choose the language wordlist to use for generating email addresses, or provide a custom URL.</p>
 
     <div class="wordlist-info">
       <strong>Current wordlist:</strong> <span id="wordlist-status">Loading...</span><br>
@@ -42,16 +42,22 @@
     </div>
 
     <div class="form-group">
-      <label for="wordlist-url">Wordlist URL:</label>
+      <label for="wordlist-selection">Select Wordlist:</label>
+      <select id="wordlist-selection" class="options-input">
+        <!-- Options populated by JavaScript -->
+      </select>
+      <p class="text-muted">Choose a language-specific wordlist or select "Custom URL" to use your own wordlist.</p>
+    </div>
+
+    <div id="custom-url-container" class="form-group" style="display: none;">
+      <label for="wordlist-url">Custom Wordlist URL:</label>
       <input type="url" id="wordlist-url" class="options-input" placeholder="https://example.com/wordlist.txt">
-      <p class="text-muted">URL should point to a text file with one word per line. Default uses German diceware
-        wordlist.</p>
+      <p class="text-muted">URL should point to a text file with one word per line.</p>
+      <button id="save-wordlist-url">Save Custom URL</button>
     </div>
 
     <div class="button-row">
-      <button id="save-wordlist-url">Save URL</button>
-      <button id="reset-wordlist-url" class="secondary">Reset to Default</button>
-      <button id="reload-wordlist" class="secondary"><i class="fas fa-sync-alt"></i> Reload</button>
+      <button id="reload-wordlist" class="secondary"><i class="fas fa-sync-alt"></i> Reload Wordlist</button>
     </div>
   </div>
 
@@ -87,8 +93,8 @@
 
   <script src="js/config.js"></script>
   <script src="js/browser-polyfill.js"></script>
+  <script src="js/flag-icons.js"></script>
   <script src="js/utils.js"></script>
   <script src="js/options.js"></script>
 </body>
-
 </html>

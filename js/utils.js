@@ -48,6 +48,11 @@ const WordlistManager = {
     return this.parseContent(text);
   },
 
+  async fetchLocalWordlist(filename) {
+    const url = browser.runtime.getURL(filename);
+    return this.fetchFromUrl(url);
+  },
+
   parseContent(content) {
     return content
       .split(/\r?\n/)
@@ -57,53 +62,103 @@ const WordlistManager = {
       .filter(word => word.length >= CONFIG.EMAIL.WORD_MIN_LENGTH);
   },
 
+  async getCurrentSelection() {
+    const { [CONFIG.STORAGE_KEYS.WORDLIST_SELECTION]: selection = CONFIG.WORDLISTS.DEFAULT } =
+      await StorageUtils.get(CONFIG.STORAGE_KEYS.WORDLIST_SELECTION);
+    return selection;
+  },
+
   async load(forceReload = false) {
     try {
-      const { [CONFIG.STORAGE_KEYS.WORDLIST_URL]: wordlistUrl = CONFIG.URLS.DEFAULT_WORDLIST } =
-        await StorageUtils.get(CONFIG.STORAGE_KEYS.WORDLIST_URL);
+      const selection = await this.getCurrentSelection();
 
       // Check cache
-      if (!forceReload && cachedWordlist && cachedWordlistUrl === wordlistUrl) {
+      if (!forceReload && cachedWordlist && cachedWordlistUrl === selection) {
         return cachedWordlist;
       }
 
-      // Try local storage cache
-      if (!forceReload) {
-        const cacheKey = StorageUtils.generateCacheKey(wordlistUrl);
-        const cached = await StorageUtils.getLocal(cacheKey);
-        if (cached[cacheKey]) {
-          cachedWordlist = cached[cacheKey];
-          cachedWordlistUrl = wordlistUrl;
-          return cachedWordlist;
-        }
-      }
+      let wordlist;
 
-      // Fetch from URL
-      const wordlist = await this.fetchFromUrl(wordlistUrl);
+      if (selection === CONFIG.WORDLISTS.CUSTOM_KEY) {
+        // Load from custom URL
+        const { [CONFIG.STORAGE_KEYS.WORDLIST_URL]: customUrl } =
+          await StorageUtils.get(CONFIG.STORAGE_KEYS.WORDLIST_URL);
+
+        if (!customUrl) {
+          throw new Error('Custom wordlist selected but no URL configured');
+        }
+
+        // Try local storage cache for custom URL
+        if (!forceReload) {
+          const cacheKey = StorageUtils.generateCacheKey(customUrl);
+          const cached = await StorageUtils.getLocal(cacheKey);
+          if (cached[cacheKey]) {
+            cachedWordlist = cached[cacheKey];
+            cachedWordlistUrl = selection;
+            return cachedWordlist;
+          }
+        }
+
+        wordlist = await this.fetchFromUrl(customUrl);
+
+        // Cache custom wordlist
+        const cacheKey = StorageUtils.generateCacheKey(customUrl);
+        await StorageUtils.setLocal({ [cacheKey]: wordlist });
+
+      } else {
+        // Load local wordlist
+        const wordlistConfig = CONFIG.WORDLISTS.AVAILABLE.find(w => w.code === selection);
+        if (!wordlistConfig) {
+          throw new Error(`Unknown wordlist selection: ${selection}`);
+        }
+
+        // Try local storage cache for local wordlist
+        if (!forceReload) {
+          const cacheKey = `local_wordlist_${selection}`;
+          const cached = await StorageUtils.getLocal(cacheKey);
+          if (cached[cacheKey]) {
+            cachedWordlist = cached[cacheKey];
+            cachedWordlistUrl = selection;
+            return cachedWordlist;
+          }
+        }
+
+        wordlist = await this.fetchLocalWordlist(wordlistConfig.file);
+
+        // Cache local wordlist
+        const cacheKey = `local_wordlist_${selection}`;
+        await StorageUtils.setLocal({ [cacheKey]: wordlist });
+      }
 
       if (wordlist.length < CONFIG.EMAIL.MIN_WORDLIST_SIZE) {
         throw new Error(`Wordlist too small (less than ${CONFIG.EMAIL.MIN_WORDLIST_SIZE} words)`);
       }
 
-      // Cache results
-      await this.cacheWordlist(wordlist, wordlistUrl);
+      // Update memory cache
+      cachedWordlist = wordlist;
+      cachedWordlistUrl = selection;
 
       return wordlist;
 
     } catch (error) {
-      console.warn('Failed to load wordlist from URL, using fallback:', error);
-      cachedWordlist = CONFIG.FALLBACK_WORDLIST;
-      cachedWordlistUrl = null;
-      return CONFIG.FALLBACK_WORDLIST;
+      console.error('Failed to load wordlist:', error);
+      // Default to English wordlist instead of fallback
+      try {
+        const englishConfig = CONFIG.WORDLISTS.AVAILABLE.find(w => w.code === 'en');
+        const wordlist = await this.fetchLocalWordlist(englishConfig.file);
+        cachedWordlist = wordlist;
+        cachedWordlistUrl = 'en';
+        return wordlist;
+      } catch (fallbackError) {
+        console.error('Failed to load English fallback:', fallbackError);
+        throw new Error('Unable to load any wordlist');
+      }
     }
   },
 
-  async cacheWordlist(wordlist, url) {
+  async cacheWordlist(wordlist, identifier) {
     cachedWordlist = wordlist;
-    cachedWordlistUrl = url;
-
-    const cacheKey = StorageUtils.generateCacheKey(url);
-    await StorageUtils.setLocal({ [cacheKey]: wordlist });
+    cachedWordlistUrl = identifier;
   },
 
   clearCache() {
@@ -113,10 +168,25 @@ const WordlistManager = {
 
   async clearLocalCache() {
     const storage = await StorageUtils.getLocal(null);
-    const keysToRemove = Object.keys(storage).filter(key => key.startsWith('wordlist_'));
+    const keysToRemove = Object.keys(storage).filter(key =>
+      key.startsWith('wordlist_') || key.startsWith('local_wordlist_')
+    );
     if (keysToRemove.length > 0) {
       await StorageUtils.removeLocal(keysToRemove);
     }
+  },
+
+  getWordlistInfo(selection) {
+    if (selection === CONFIG.WORDLISTS.CUSTOM_KEY) {
+      return { name: 'Custom URL', flag: null, isCustom: true };
+    }
+
+    const config = CONFIG.WORDLISTS.AVAILABLE.find(w => w.code === selection);
+    return config ? {
+      name: config.name,
+      flag: config.flag,
+      isCustom: false
+    } : null;
   }
 };
 

@@ -25,6 +25,7 @@
     "scripts": [
       "js/config.js",
       "js/browser-polyfill.js",
+      "js/flag-icons.js",
       "js/utils.js",
       "js/background.js"
     ],
@@ -38,6 +39,7 @@
       "js": [
         "js/config.js",
         "js/browser-polyfill.js",
+        "js/flag-icons.js",
         "js/utils.js",
         "js/content.js"
       ],
@@ -72,6 +74,8 @@
     "css/fontawesome.min.css",
     "css/solid.min.css",
     "webfonts/fa-solid-900.woff2",
-    "webfonts/fa-solid-900.ttf"
+    "webfonts/fa-solid-900.ttf",
+    "wordlists/*.txt",
+    "flags/*.svg"
   ]
 }

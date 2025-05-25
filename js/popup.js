@@ -1,7 +1,3 @@
-/**
- * Refactored popup script that handles the toolbar popup interface
- */
-
 class PopupController {
   constructor() {
     this.currentDomain = null;
