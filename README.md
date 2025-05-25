@@ -38,13 +38,11 @@ Install directly from the Firefox Add-ons store.
    - Click "⚙️ Settings" or the extension will prompt you on first use
    - Enter your catch-all domain (e.g., `mydomain.com`)
    - Click "Save Domain"
+   - Choose you wordlist
 
 2. **Optional - Custom Wordlist**:
    - In settings, you can configure a custom wordlist URL
    - The URL should point to a text file with one word per line
-   - There are two list inside this repo:
-     - English Diceware Wordlist (default) [[Source]](https://www.eff.org/files/2016/07/18/eff_large_wordlist.txt): `https://raw.githubusercontent.com/mietzen/catch-all-autofill/refs/heads/main/wordlists/eff_large_wordlist.txt`
-     - German Diceware Wordlist [[Source]](https://github.com/dys2p/wordlists-de/blob/main/de-7776-v1.txt): `https://raw.githubusercontent.com/mietzen/catch-all-autofill/refs/heads/main/wordlists/de-7776-v1.txt`
 
 ## Usage
 
@@ -74,7 +72,6 @@ Install directly from the Firefox Add-ons store.
 
 ## Todo
 
-- Use local wordlist, dropdown with flags and custom option that activates the url field
 - Json export should save all settings!
 - Json import
 - Github backup option (Json export) <https://stackoverflow.com/a/69290756/6847446> (GraphQL)
