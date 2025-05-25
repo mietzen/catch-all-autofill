@@ -1,0 +1,1144 @@
+.fib, .fi {
+  background-size: contain;
+  background-position: 50%;
+  background-repeat: no-repeat;
+}
+
+.fi {
+  position: relative;
+  display: inline-block;
+  width: 1.333333em;
+  line-height: 1em;
+}
+.fi:before {
+  content: " ";
+}
+.fi.fis {
+  width: 1em;
+}
+
+.fi-xx {
+  background-image: url(../assests/flags/xx.svg);
+}
+
+.fi-ad {
+  background-image: url(../assests/flags/ad.svg);
+}
+
+.fi-ae {
+  background-image: url(../assests/flags/ae.svg);
+}
+
+.fi-af {
+  background-image: url(../assests/flags/af.svg);
+}
+
+.fi-ag {
+  background-image: url(../assests/flags/ag.svg);
+}
+
+.fi-ai {
+  background-image: url(../assests/flags/ai.svg);
+}
+
+.fi-al {
+  background-image: url(../assests/flags/al.svg);
+}
+
+.fi-am {
+  background-image: url(../assests/flags/am.svg);
+}
+
+.fi-ao {
+  background-image: url(../assests/flags/ao.svg);
+}
+
+.fi-aq {
+  background-image: url(../assests/flags/aq.svg);
+}
+
+.fi-ar {
+  background-image: url(../assests/flags/ar.svg);
+}
+
+.fi-as {
+  background-image: url(../assests/flags/as.svg);
+}
+
+.fi-at {
+  background-image: url(../assests/flags/at.svg);
+}
+
+.fi-au {
+  background-image: url(../assests/flags/au.svg);
+}
+
+.fi-aw {
+  background-image: url(../assests/flags/aw.svg);
+}
+
+.fi-ax {
+  background-image: url(../assests/flags/ax.svg);
+}
+
+.fi-az {
+  background-image: url(../assests/flags/az.svg);
+}
+
+.fi-ba {
+  background-image: url(../assests/flags/ba.svg);
+}
+
+.fi-bb {
+  background-image: url(../assests/flags/bb.svg);
+}
+
+.fi-bd {
+  background-image: url(../assests/flags/bd.svg);
+}
+
+.fi-be {
+  background-image: url(../assests/flags/be.svg);
+}
+
+.fi-bf {
+  background-image: url(../assests/flags/bf.svg);
+}
+
+.fi-bg {
+  background-image: url(../assests/flags/bg.svg);
+}
+
+.fi-bh {
+  background-image: url(../assests/flags/bh.svg);
+}
+
+.fi-bi {
+  background-image: url(../assests/flags/bi.svg);
+}
+
+.fi-bj {
+  background-image: url(../assests/flags/bj.svg);
+}
+
+.fi-bl {
+  background-image: url(../assests/flags/bl.svg);
+}
+
+.fi-bm {
+  background-image: url(../assests/flags/bm.svg);
+}
+
+.fi-bn {
+  background-image: url(../assests/flags/bn.svg);
+}
+
+.fi-bo {
+  background-image: url(../assests/flags/bo.svg);
+}
+
+.fi-bq {
+  background-image: url(../assests/flags/bq.svg);
+}
+
+.fi-br {
+  background-image: url(../assests/flags/br.svg);
+}
+
+.fi-bs {
+  background-image: url(../assests/flags/bs.svg);
+}
+
+.fi-bt {
+  background-image: url(../assests/flags/bt.svg);
+}
+
+.fi-bv {
+  background-image: url(../assests/flags/bv.svg);
+}
+
+.fi-bw {
+  background-image: url(../assests/flags/bw.svg);
+}
+
+.fi-by {
+  background-image: url(../assests/flags/by.svg);
+}
+
+.fi-bz {
+  background-image: url(../assests/flags/bz.svg);
+}
+
+.fi-ca {
+  background-image: url(../assests/flags/ca.svg);
+}
+
+.fi-cc {
+  background-image: url(../assests/flags/cc.svg);
+}
+
+.fi-cd {
+  background-image: url(../assests/flags/cd.svg);
+}
+
+.fi-cf {
+  background-image: url(../assests/flags/cf.svg);
+}
+
+.fi-cg {
+  background-image: url(../assests/flags/cg.svg);
+}
+
+.fi-ch {
+  background-image: url(../assests/flags/ch.svg);
+}
+
+.fi-ci {
+  background-image: url(../assests/flags/ci.svg);
+}
+
+.fi-ck {
+  background-image: url(../assests/flags/ck.svg);
+}
+
+.fi-cl {
+  background-image: url(../assests/flags/cl.svg);
+}
+
+.fi-cm {
+  background-image: url(../assests/flags/cm.svg);
+}
+
+.fi-cn {
+  background-image: url(../assests/flags/cn.svg);
+}
+
+.fi-co {
+  background-image: url(../assests/flags/co.svg);
+}
+
+.fi-cr {
+  background-image: url(../assests/flags/cr.svg);
+}
+
+.fi-cu {
+  background-image: url(../assests/flags/cu.svg);
+}
+
+.fi-cv {
+  background-image: url(../assests/flags/cv.svg);
+}
+
+.fi-cw {
+  background-image: url(../assests/flags/cw.svg);
+}
+
+.fi-cx {
+  background-image: url(../assests/flags/cx.svg);
+}
+
+.fi-cy {
+  background-image: url(../assests/flags/cy.svg);
+}
+
+.fi-cz {
+  background-image: url(../assests/flags/cz.svg);
+}
+
+.fi-de {
+  background-image: url(../assests/flags/de.svg);
+}
+
+.fi-dj {
+  background-image: url(../assests/flags/dj.svg);
+}
+
+.fi-dk {
+  background-image: url(../assests/flags/dk.svg);
+}
+
+.fi-dm {
+  background-image: url(../assests/flags/dm.svg);
+}
+
+.fi-do {
+  background-image: url(../assests/flags/do.svg);
+}
+
+.fi-dz {
+  background-image: url(../assests/flags/dz.svg);
+}
+
+.fi-ec {
+  background-image: url(../assests/flags/ec.svg);
+}
+
+.fi-ee {
+  background-image: url(../assests/flags/ee.svg);
+}
+
+.fi-eg {
+  background-image: url(../assests/flags/eg.svg);
+}
+
+.fi-eh {
+  background-image: url(../assests/flags/eh.svg);
+}
+
+.fi-er {
+  background-image: url(../assests/flags/er.svg);
+}
+
+.fi-es {
+  background-image: url(../assests/flags/es.svg);
+}
+
+.fi-et {
+  background-image: url(../assests/flags/et.svg);
+}
+
+.fi-fi {
+  background-image: url(../assests/flags/fi.svg);
+}
+
+.fi-fj {
+  background-image: url(../assests/flags/fj.svg);
+}
+
+.fi-fk {
+  background-image: url(../assests/flags/fk.svg);
+}
+
+.fi-fm {
+  background-image: url(../assests/flags/fm.svg);
+}
+
+.fi-fo {
+  background-image: url(../assests/flags/fo.svg);
+}
+
+.fi-fr {
+  background-image: url(../assests/flags/fr.svg);
+}
+
+.fi-ga {
+  background-image: url(../assests/flags/ga.svg);
+}
+
+.fi-gb {
+  background-image: url(../assests/flags/gb.svg);
+}
+
+.fi-gd {
+  background-image: url(../assests/flags/gd.svg);
+}
+
+.fi-ge {
+  background-image: url(../assests/flags/ge.svg);
+}
+
+.fi-gf {
+  background-image: url(../assests/flags/gf.svg);
+}
+
+.fi-gg {
+  background-image: url(../assests/flags/gg.svg);
+}
+
+.fi-gh {
+  background-image: url(../assests/flags/gh.svg);
+}
+
+.fi-gi {
+  background-image: url(../assests/flags/gi.svg);
+}
+
+.fi-gl {
+  background-image: url(../assests/flags/gl.svg);
+}
+
+.fi-gm {
+  background-image: url(../assests/flags/gm.svg);
+}
+
+.fi-gn {
+  background-image: url(../assests/flags/gn.svg);
+}
+
+.fi-gp {
+  background-image: url(../assests/flags/gp.svg);
+}
+
+.fi-gq {
+  background-image: url(../assests/flags/gq.svg);
+}
+
+.fi-gr {
+  background-image: url(../assests/flags/gr.svg);
+}
+
+.fi-gs {
+  background-image: url(../assests/flags/gs.svg);
+}
+
+.fi-gt {
+  background-image: url(../assests/flags/gt.svg);
+}
+
+.fi-gu {
+  background-image: url(../assests/flags/gu.svg);
+}
+
+.fi-gw {
+  background-image: url(../assests/flags/gw.svg);
+}
+
+.fi-gy {
+  background-image: url(../assests/flags/gy.svg);
+}
+
+.fi-hk {
+  background-image: url(../assests/flags/hk.svg);
+}
+
+.fi-hm {
+  background-image: url(../assests/flags/hm.svg);
+}
+
+.fi-hn {
+  background-image: url(../assests/flags/hn.svg);
+}
+
+.fi-hr {
+  background-image: url(../assests/flags/hr.svg);
+}
+
+.fi-ht {
+  background-image: url(../assests/flags/ht.svg);
+}
+
+.fi-hu {
+  background-image: url(../assests/flags/hu.svg);
+}
+
+.fi-id {
+  background-image: url(../assests/flags/id.svg);
+}
+
+.fi-ie {
+  background-image: url(../assests/flags/ie.svg);
+}
+
+.fi-il {
+  background-image: url(../assests/flags/il.svg);
+}
+
+.fi-im {
+  background-image: url(../assests/flags/im.svg);
+}
+
+.fi-in {
+  background-image: url(../assests/flags/in.svg);
+}
+
+.fi-io {
+  background-image: url(../assests/flags/io.svg);
+}
+
+.fi-iq {
+  background-image: url(../assests/flags/iq.svg);
+}
+
+.fi-ir {
+  background-image: url(../assests/flags/ir.svg);
+}
+
+.fi-is {
+  background-image: url(../assests/flags/is.svg);
+}
+
+.fi-it {
+  background-image: url(../assests/flags/it.svg);
+}
+
+.fi-je {
+  background-image: url(../assests/flags/je.svg);
+}
+
+.fi-jm {
+  background-image: url(../assests/flags/jm.svg);
+}
+
+.fi-jo {
+  background-image: url(../assests/flags/jo.svg);
+}
+
+.fi-jp {
+  background-image: url(../assests/flags/jp.svg);
+}
+
+.fi-ke {
+  background-image: url(../assests/flags/ke.svg);
+}
+
+.fi-kg {
+  background-image: url(../assests/flags/kg.svg);
+}
+
+.fi-kh {
+  background-image: url(../assests/flags/kh.svg);
+}
+
+.fi-ki {
+  background-image: url(../assests/flags/ki.svg);
+}
+
+.fi-km {
+  background-image: url(../assests/flags/km.svg);
+}
+
+.fi-kn {
+  background-image: url(../assests/flags/kn.svg);
+}
+
+.fi-kp {
+  background-image: url(../assests/flags/kp.svg);
+}
+
+.fi-kr {
+  background-image: url(../assests/flags/kr.svg);
+}
+
+.fi-kw {
+  background-image: url(../assests/flags/kw.svg);
+}
+
+.fi-ky {
+  background-image: url(../assests/flags/ky.svg);
+}
+
+.fi-kz {
+  background-image: url(../assests/flags/kz.svg);
+}
+
+.fi-la {
+  background-image: url(../assests/flags/la.svg);
+}
+
+.fi-lb {
+  background-image: url(../assests/flags/lb.svg);
+}
+
+.fi-lc {
+  background-image: url(../assests/flags/lc.svg);
+}
+
+.fi-li {
+  background-image: url(../assests/flags/li.svg);
+}
+
+.fi-lk {
+  background-image: url(../assests/flags/lk.svg);
+}
+
+.fi-lr {
+  background-image: url(../assests/flags/lr.svg);
+}
+
+.fi-ls {
+  background-image: url(../assests/flags/ls.svg);
+}
+
+.fi-lt {
+  background-image: url(../assests/flags/lt.svg);
+}
+
+.fi-lu {
+  background-image: url(../assests/flags/lu.svg);
+}
+
+.fi-lv {
+  background-image: url(../assests/flags/lv.svg);
+}
+
+.fi-ly {
+  background-image: url(../assests/flags/ly.svg);
+}
+
+.fi-ma {
+  background-image: url(../assests/flags/ma.svg);
+}
+
+.fi-mc {
+  background-image: url(../assests/flags/mc.svg);
+}
+
+.fi-md {
+  background-image: url(../assests/flags/md.svg);
+}
+
+.fi-me {
+  background-image: url(../assests/flags/me.svg);
+}
+
+.fi-mf {
+  background-image: url(../assests/flags/mf.svg);
+}
+
+.fi-mg {
+  background-image: url(../assests/flags/mg.svg);
+}
+
+.fi-mh {
+  background-image: url(../assests/flags/mh.svg);
+}
+
+.fi-mk {
+  background-image: url(../assests/flags/mk.svg);
+}
+
+.fi-ml {
+  background-image: url(../assests/flags/ml.svg);
+}
+
+.fi-mm {
+  background-image: url(../assests/flags/mm.svg);
+}
+
+.fi-mn {
+  background-image: url(../assests/flags/mn.svg);
+}
+
+.fi-mo {
+  background-image: url(../assests/flags/mo.svg);
+}
+
+.fi-mp {
+  background-image: url(../assests/flags/mp.svg);
+}
+
+.fi-mq {
+  background-image: url(../assests/flags/mq.svg);
+}
+
+.fi-mr {
+  background-image: url(../assests/flags/mr.svg);
+}
+
+.fi-ms {
+  background-image: url(../assests/flags/ms.svg);
+}
+
+.fi-mt {
+  background-image: url(../assests/flags/mt.svg);
+}
+
+.fi-mu {
+  background-image: url(../assests/flags/mu.svg);
+}
+
+.fi-mv {
+  background-image: url(../assests/flags/mv.svg);
+}
+
+.fi-mw {
+  background-image: url(../assests/flags/mw.svg);
+}
+
+.fi-mx {
+  background-image: url(../assests/flags/mx.svg);
+}
+
+.fi-my {
+  background-image: url(../assests/flags/my.svg);
+}
+
+.fi-mz {
+  background-image: url(../assests/flags/mz.svg);
+}
+
+.fi-na {
+  background-image: url(../assests/flags/na.svg);
+}
+
+.fi-nc {
+  background-image: url(../assests/flags/nc.svg);
+}
+
+.fi-ne {
+  background-image: url(../assests/flags/ne.svg);
+}
+
+.fi-nf {
+  background-image: url(../assests/flags/nf.svg);
+}
+
+.fi-ng {
+  background-image: url(../assests/flags/ng.svg);
+}
+
+.fi-ni {
+  background-image: url(../assests/flags/ni.svg);
+}
+
+.fi-nl {
+  background-image: url(../assests/flags/nl.svg);
+}
+
+.fi-no {
+  background-image: url(../assests/flags/no.svg);
+}
+
+.fi-np {
+  background-image: url(../assests/flags/np.svg);
+}
+
+.fi-nr {
+  background-image: url(../assests/flags/nr.svg);
+}
+
+.fi-nu {
+  background-image: url(../assests/flags/nu.svg);
+}
+
+.fi-nz {
+  background-image: url(../assests/flags/nz.svg);
+}
+
+.fi-om {
+  background-image: url(../assests/flags/om.svg);
+}
+
+.fi-pa {
+  background-image: url(../assests/flags/pa.svg);
+}
+
+.fi-pe {
+  background-image: url(../assests/flags/pe.svg);
+}
+
+.fi-pf {
+  background-image: url(../assests/flags/pf.svg);
+}
+
+.fi-pg {
+  background-image: url(../assests/flags/pg.svg);
+}
+
+.fi-ph {
+  background-image: url(../assests/flags/ph.svg);
+}
+
+.fi-pk {
+  background-image: url(../assests/flags/pk.svg);
+}
+
+.fi-pl {
+  background-image: url(../assests/flags/pl.svg);
+}
+
+.fi-pm {
+  background-image: url(../assests/flags/pm.svg);
+}
+
+.fi-pn {
+  background-image: url(../assests/flags/pn.svg);
+}
+
+.fi-pr {
+  background-image: url(../assests/flags/pr.svg);
+}
+
+.fi-ps {
+  background-image: url(../assests/flags/ps.svg);
+}
+
+.fi-pt {
+  background-image: url(../assests/flags/pt.svg);
+}
+
+.fi-pw {
+  background-image: url(../assests/flags/pw.svg);
+}
+
+.fi-py {
+  background-image: url(../assests/flags/py.svg);
+}
+
+.fi-qa {
+  background-image: url(../assests/flags/qa.svg);
+}
+
+.fi-re {
+  background-image: url(../assests/flags/re.svg);
+}
+
+.fi-ro {
+  background-image: url(../assests/flags/ro.svg);
+}
+
+.fi-rs {
+  background-image: url(../assests/flags/rs.svg);
+}
+
+.fi-ru {
+  background-image: url(../assests/flags/ru.svg);
+}
+
+.fi-rw {
+  background-image: url(../assests/flags/rw.svg);
+}
+
+.fi-sa {
+  background-image: url(../assests/flags/sa.svg);
+}
+
+.fi-sb {
+  background-image: url(../assests/flags/sb.svg);
+}
+
+.fi-sc {
+  background-image: url(../assests/flags/sc.svg);
+}
+
+.fi-sd {
+  background-image: url(../assests/flags/sd.svg);
+}
+
+.fi-se {
+  background-image: url(../assests/flags/se.svg);
+}
+
+.fi-sg {
+  background-image: url(../assests/flags/sg.svg);
+}
+
+.fi-sh {
+  background-image: url(../assests/flags/sh.svg);
+}
+
+.fi-si {
+  background-image: url(../assests/flags/si.svg);
+}
+
+.fi-sj {
+  background-image: url(../assests/flags/sj.svg);
+}
+
+.fi-sk {
+  background-image: url(../assests/flags/sk.svg);
+}
+
+.fi-sl {
+  background-image: url(../assests/flags/sl.svg);
+}
+
+.fi-sm {
+  background-image: url(../assests/flags/sm.svg);
+}
+
+.fi-sn {
+  background-image: url(../assests/flags/sn.svg);
+}
+
+.fi-so {
+  background-image: url(../assests/flags/so.svg);
+}
+
+.fi-sr {
+  background-image: url(../assests/flags/sr.svg);
+}
+
+.fi-ss {
+  background-image: url(../assests/flags/ss.svg);
+}
+
+.fi-st {
+  background-image: url(../assests/flags/st.svg);
+}
+
+.fi-sv {
+  background-image: url(../assests/flags/sv.svg);
+}
+
+.fi-sx {
+  background-image: url(../assests/flags/sx.svg);
+}
+
+.fi-sy {
+  background-image: url(../assests/flags/sy.svg);
+}
+
+.fi-sz {
+  background-image: url(../assests/flags/sz.svg);
+}
+
+.fi-tc {
+  background-image: url(../assests/flags/tc.svg);
+}
+
+.fi-td {
+  background-image: url(../assests/flags/td.svg);
+}
+
+.fi-tf {
+  background-image: url(../assests/flags/tf.svg);
+}
+
+.fi-tg {
+  background-image: url(../assests/flags/tg.svg);
+}
+
+.fi-th {
+  background-image: url(../assests/flags/th.svg);
+}
+
+.fi-tj {
+  background-image: url(../assests/flags/tj.svg);
+}
+
+.fi-tk {
+  background-image: url(../assests/flags/tk.svg);
+}
+
+.fi-tl {
+  background-image: url(../assests/flags/tl.svg);
+}
+
+.fi-tm {
+  background-image: url(../assests/flags/tm.svg);
+}
+
+.fi-tn {
+  background-image: url(../assests/flags/tn.svg);
+}
+
+.fi-to {
+  background-image: url(../assests/flags/to.svg);
+}
+
+.fi-tr {
+  background-image: url(../assests/flags/tr.svg);
+}
+
+.fi-tt {
+  background-image: url(../assests/flags/tt.svg);
+}
+
+.fi-tv {
+  background-image: url(../assests/flags/tv.svg);
+}
+
+.fi-tw {
+  background-image: url(../assests/flags/tw.svg);
+}
+
+.fi-tz {
+  background-image: url(../assests/flags/tz.svg);
+}
+
+.fi-ua {
+  background-image: url(../assests/flags/ua.svg);
+}
+
+.fi-ug {
+  background-image: url(../assests/flags/ug.svg);
+}
+
+.fi-um {
+  background-image: url(../assests/flags/um.svg);
+}
+
+.fi-us {
+  background-image: url(../assests/flags/us.svg);
+}
+
+.fi-uy {
+  background-image: url(../assests/flags/uy.svg);
+}
+
+.fi-uz {
+  background-image: url(../assests/flags/uz.svg);
+}
+
+.fi-va {
+  background-image: url(../assests/flags/va.svg);
+}
+
+.fi-vc {
+  background-image: url(../assests/flags/vc.svg);
+}
+
+.fi-ve {
+  background-image: url(../assests/flags/ve.svg);
+}
+
+.fi-vg {
+  background-image: url(../assests/flags/vg.svg);
+}
+
+.fi-vi {
+  background-image: url(../assests/flags/vi.svg);
+}
+
+.fi-vn {
+  background-image: url(../assests/flags/vn.svg);
+}
+
+.fi-vu {
+  background-image: url(../assests/flags/vu.svg);
+}
+
+.fi-wf {
+  background-image: url(../assests/flags/wf.svg);
+}
+
+.fi-ws {
+  background-image: url(../assests/flags/ws.svg);
+}
+
+.fi-ye {
+  background-image: url(../assests/flags/ye.svg);
+}
+
+.fi-yt {
+  background-image: url(../assests/flags/yt.svg);
+}
+
+.fi-za {
+  background-image: url(../assests/flags/za.svg);
+}
+
+.fi-zm {
+  background-image: url(../assests/flags/zm.svg);
+}
+
+.fi-zw {
+  background-image: url(../assests/flags/zw.svg);
+}
+
+.fi-arab {
+  background-image: url(../assests/flags/arab.svg);
+}
+.fi-arab.fis {
+  background-image: url(../assests/flags/1x1/arab.svg);
+}
+
+.fi-asean {
+  background-image: url(../assests/flags/asean.svg);
+}
+.fi-asean.fis {
+  background-image: url(../assests/flags/1x1/asean.svg);
+}
+
+.fi-cefta {
+  background-image: url(../assests/flags/cefta.svg);
+}
+.fi-cefta.fis {
+  background-image: url(../assests/flags/1x1/cefta.svg);
+}
+
+.fi-cp {
+  background-image: url(../assests/flags/cp.svg);
+}
+
+.fi-dg {
+  background-image: url(../assests/flags/dg.svg);
+}
+
+.fi-eac {
+  background-image: url(../assests/flags/eac.svg);
+}
+.fi-eac.fis {
+  background-image: url(../assests/flags/1x1/eac.svg);
+}
+
+.fi-es-ct {
+  background-image: url(../assests/flags/es-ct.svg);
+}
+.fi-es-ct.fis {
+  background-image: url(../assests/flags/1x1/es-ct.svg);
+}
+
+.fi-es-ga {
+  background-image: url(../assests/flags/es-ga.svg);
+}
+.fi-es-ga.fis {
+  background-image: url(../assests/flags/1x1/es-ga.svg);
+}
+
+.fi-es-pv {
+  background-image: url(../assests/flags/es-pv.svg);
+}
+.fi-es-pv.fis {
+  background-image: url(../assests/flags/1x1/es-pv.svg);
+}
+
+.fi-eu {
+  background-image: url(../assests/flags/eu.svg);
+}
+
+.fi-gb-eng {
+  background-image: url(../assests/flags/gb-eng.svg);
+}
+.fi-gb-eng.fis {
+  background-image: url(../assests/flags/1x1/gb-eng.svg);
+}
+
+.fi-gb-nir {
+  background-image: url(../assests/flags/gb-nir.svg);
+}
+.fi-gb-nir.fis {
+  background-image: url(../assests/flags/1x1/gb-nir.svg);
+}
+
+.fi-gb-sct {
+  background-image: url(../assests/flags/gb-sct.svg);
+}
+.fi-gb-sct.fis {
+  background-image: url(../assests/flags/1x1/gb-sct.svg);
+}
+
+.fi-gb-wls {
+  background-image: url(../assests/flags/gb-wls.svg);
+}
+.fi-gb-wls.fis {
+  background-image: url(../assests/flags/1x1/gb-wls.svg);
+}
+
+.fi-ic {
+  background-image: url(../assests/flags/ic.svg);
+}
+
+.fi-pc {
+  background-image: url(../assests/flags/pc.svg);
+}
+
+.fi-sh-ac {
+  background-image: url(../assests/flags/sh-ac.svg);
+}
+.fi-sh-ac.fis {
+  background-image: url(../assests/flags/1x1/sh-ac.svg);
+}
+
+.fi-sh-hl {
+  background-image: url(../assests/flags/sh-hl.svg);
+}
+.fi-sh-hl.fis {
+  background-image: url(../assests/flags/1x1/sh-hl.svg);
+}
+
+.fi-sh-ta {
+  background-image: url(../assests/flags/sh-ta.svg);
+}
+.fi-sh-ta.fis {
+  background-image: url(../assests/flags/1x1/sh-ta.svg);
+}
+
+.fi-un {
+  background-image: url(../assests/flags/un.svg);
+}
+
+.fi-xk {
+  background-image: url(../assests/flags/xk.svg);
+}
