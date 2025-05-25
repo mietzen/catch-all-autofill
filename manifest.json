@@ -14,11 +14,11 @@
     "default_popup": "src/html/popup.html",
     "default_title": "Generate Email",
     "default_icon": {
-      "16": "src/assests/icons/icon-16.png",
-      "32": "src/assests/icons/icon-32.png",
-      "48": "src/assests/icons/icon-48.png",
-      "96": "src/assests/icons/icon-96.png",
-      "128": "src/assests/icons/icon-128.png"
+      "16": "src/assets/icons/icon-16.png",
+      "32": "src/assets/icons/icon-32.png",
+      "48": "src/assets/icons/icon-48.png",
+      "96": "src/assets/icons/icon-96.png",
+      "128": "src/assets/icons/icon-128.png"
     }
   },
   "background": {
@@ -46,11 +46,11 @@
     }
   ],
   "icons": {
-    "16": "src/assests/icons/icon-16.png",
-    "32": "src/assests/icons/icon-32.png",
-    "48": "src/assests/icons/icon-48.png",
-    "96": "src/assests/icons/icon-96.png",
-    "128": "src/assests/icons/icon-128.png"
+    "16": "src/assets/icons/icon-16.png",
+    "32": "src/assets/icons/icon-32.png",
+    "48": "src/assets/icons/icon-48.png",
+    "96": "src/assets/icons/icon-96.png",
+    "128": "src/assets/icons/icon-128.png"
   },
   "options_ui": {
     "page": "src/html/options.html",
@@ -63,17 +63,17 @@
     }
   },
   "web_accessible_resources": [
-    "src/assests/icons/icon-16.png",
-    "src/assests/icons/icon-32.png",
-    "src/assests/icons/icon-48.png",
-    "src/assests/icons/icon-96.png",
-    "src/assests/icons/icon-128.png",
+    "src/assets/icons/icon-16.png",
+    "src/assets/icons/icon-32.png",
+    "src/assets/icons/icon-48.png",
+    "src/assets/icons/icon-96.png",
+    "src/assets/icons/icon-128.png",
     "src/css/styles.css",
     "src/css/fontawesome.min.css",
     "src/css/solid.min.css",
     "src/webfonts/fa-solid-900.woff2",
     "src/webfonts/fa-solid-900.ttf",
-    "src/assests/wordlists/*.txt",
+    "src/assets/wordlists/*.txt",
     "src/flags/*.svg"
   ]
 }

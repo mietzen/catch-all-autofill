@@ -59,7 +59,7 @@ class BackgroundController {
   async showNoDomainNotification() {
     return browser.notifications.create({
       type: "basic",
-      iconUrl: browser.runtime.getURL("src/assests/icons/icon-48.png"),
+      iconUrl: browser.runtime.getURL("src/assets/icons/icon-48.png"),
       title: CONFIG.EXTENSION_ID,
       message: "Please set a catch-all domain in the extension options"
     });
@@ -191,7 +191,7 @@ class BackgroundController {
   async showNotification(message) {
     return browser.notifications.create({
       type: "basic",
-      iconUrl: browser.runtime.getURL("src/assests/icons/icon-48.png"),
+      iconUrl: browser.runtime.getURL("src/assets/icons/icon-48.png"),
       title: message.title || CONFIG.EXTENSION_ID,
       message: message.message
     });

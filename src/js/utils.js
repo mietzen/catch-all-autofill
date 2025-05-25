@@ -1,7 +1,3 @@
-/**
- * Refactored utility functions for the extension
- */
-
 // Global wordlist cache
 let cachedWordlist = null;
 let cachedWordlistUrl = null;
