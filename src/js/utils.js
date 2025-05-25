@@ -490,16 +490,3 @@ const FlagIcons = {
 if (typeof window !== 'undefined') {
   window.FlagIcons = FlagIcons;
 }
-
-// Legacy function exports for backward compatibility
-function pickRandom(arr) { return EmailGenerator.pickRandom(arr); }
-async function generateEmail(catchAllDomain) { return EmailGenerator.generate(catchAllDomain); }
-async function logEmailUsage(domain, generatedEmail) { return UsageLogger.log(domain, generatedEmail); }
-async function copyToClipboard(text) { return UIUtils.copyToClipboard(text); }
-async function getCurrentDomain() { return BrowserUtils.getCurrentDomain(); }
-function isValidDomain(domain) { return ValidationUtils.isValidDomain(domain); }
-function isValidUrl(url) { return ValidationUtils.isValidUrl(url); }
-function downloadFile(data, filename, type) { return UIUtils.downloadFile(data, filename, type); }
-async function loadWordlist(forceReload) { return WordlistManager.load(forceReload); }
-function clearWordlistCache() { return WordlistManager.clearCache(); }
-async function clearWordlistLocalCache() { return WordlistManager.clearLocalCache(); }
