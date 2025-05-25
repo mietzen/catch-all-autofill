@@ -87,7 +87,7 @@ Install directly from the Firefox Add-ons store.
 
 - Make html nicer
 - Port to Chrome
-- Screenshots / screencasts
+- Screenshots / screencast
 - Test Sync
 - Upload to Stores
 - CI/CD
