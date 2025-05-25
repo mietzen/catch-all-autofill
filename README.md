@@ -69,11 +69,12 @@ Install directly from the Firefox Add-ons store.
 - View all generated emails in extension settings
 - Filter by domain to find specific emails
 - Copy any previously generated email with one click
-- Export your email history as JSON or CSV
+- Import / Export your email history and settings as JSON
 - Delete individual entries or clear all history
 
 ## Todo
 
+- Use local wordlist, dropdown with flags and custom option that activates the url field
 - Json export should save all settings!
 - Json import
 - Github backup option (Json export) <https://stackoverflow.com/a/69290756/6847446> (GraphQL)
@@ -88,8 +89,8 @@ Install directly from the Firefox Add-ons store.
   - PAT (Should be excluded from backup!)
 
 - Make html nicer
-- Screenshots / screencasts
 - Port to Chrome
+- Screenshots / screencasts
 - Test Sync
 - Upload to Stores
 - CI/CD
