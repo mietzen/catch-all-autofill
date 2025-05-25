@@ -94,3 +94,9 @@ Install directly from the Firefox Add-ons store.
 - Test Sync
 - Upload to Stores
 - CI/CD
+
+## Resources
+
+- [Font Awesome Free](https://fontawesome.com/) (SIL OFL 1.1)
+- [flag-icons](https://github.com/lipis/flag-icons?tab=readme-ov-file) (MIT)
+- [webextension-polyfill](https://github.com/mozilla/webextension-polyfill) (MPL-2.0)
