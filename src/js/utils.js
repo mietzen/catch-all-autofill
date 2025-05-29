@@ -425,53 +425,60 @@ const ValidationUtils = {
 /**
  * Export management
  */
-/**
- * Export management
- */
 const ExportUtils = {
+  async generateBackupData() {
+    // Get all extension data
+    const [usageLog, syncStorage, localStorage] = await Promise.all([
+      UsageLogger.getLog(),
+      StorageUtils.get(null), // Get all sync storage
+      StorageUtils.getLocal(null) // Get all local storage
+    ]);
+
+    // Prepare export data (exclude GitHub PAT for security)
+    const exportData = {
+      metadata: {
+        exportDate: new Date().toISOString(),
+        version: CONFIG.DATA_VERSION,
+        extensionId: CONFIG.EXTENSION_ID
+      },
+      settings: {
+        // Core settings from sync storage
+        catchAllDomain: syncStorage[CONFIG.STORAGE_KEYS.CATCH_ALL_DOMAIN] || '',
+        wordlistSelection: syncStorage[CONFIG.STORAGE_KEYS.WORDLIST_SELECTION] || CONFIG.WORDLISTS.DEFAULT,
+        wordlistUrl: syncStorage[CONFIG.STORAGE_KEYS.WORDLIST_URL] || '',
+        dataVersion: syncStorage[CONFIG.STORAGE_KEYS.DATA_VERSION] || CONFIG.DATA_VERSION,
+        // GitHub settings (excluding PAT for security)
+        githubRepository: syncStorage[CONFIG.STORAGE_KEYS.GITHUB_REPOSITORY] || '',
+        githubBranch: syncStorage[CONFIG.STORAGE_KEYS.GITHUB_BRANCH] || 'main',
+        githubAutoBackup: syncStorage[CONFIG.STORAGE_KEYS.GITHUB_AUTO_BACKUP] || false
+      },
+      cache: {
+        // Local storage cache data (wordlists, etc.)
+        localStorageKeys: Object.keys(localStorage).filter(key => 
+          key.startsWith('wordlist_') || key.startsWith('local_wordlist_')
+        ),
+        // Note: We don't export actual cached wordlist data to keep file size reasonable
+        cacheInfo: `${Object.keys(localStorage).length} cached items`
+      },
+      usageLog: usageLog,
+      statistics: {
+        totalEmails: usageLog.length,
+        uniqueDomains: [...new Set(usageLog.map(entry => entry.domain))].length,
+        dateRange: usageLog.length > 0 ? {
+          first: usageLog.reduce((min, entry) => entry.date < min ? entry.date : min, usageLog[0].date),
+          last: usageLog.reduce((max, entry) => entry.date > max ? entry.date : max, usageLog[0].date)
+        } : null
+      }
+    };
+
+    return exportData;
+  },
+
   async exportAsJson() {
     try {
-      // Get all extension data
-      const [usageLog, syncStorage, localStorage] = await Promise.all([
-        UsageLogger.getLog(),
-        StorageUtils.get(null), // Get all sync storage
-        StorageUtils.getLocal(null) // Get all local storage
-      ]);
+      const exportData = await this.generateBackupData();
 
-      // Prepare export data
-      const exportData = {
-        metadata: {
-          exportDate: new Date().toISOString(),
-          version: CONFIG.DATA_VERSION,
-          extensionId: CONFIG.EXTENSION_ID
-        },
-        settings: {
-          // Core settings from sync storage
-          catchAllDomain: syncStorage[CONFIG.STORAGE_KEYS.CATCH_ALL_DOMAIN] || '',
-          wordlistSelection: syncStorage[CONFIG.STORAGE_KEYS.WORDLIST_SELECTION] || CONFIG.WORDLISTS.DEFAULT,
-          wordlistUrl: syncStorage[CONFIG.STORAGE_KEYS.WORDLIST_URL] || '',
-          dataVersion: syncStorage[CONFIG.STORAGE_KEYS.DATA_VERSION] || CONFIG.DATA_VERSION
-        },
-        cache: {
-          // Local storage cache data (wordlists, etc.)
-          localStorageKeys: Object.keys(localStorage).filter(key => 
-            key.startsWith('wordlist_') || key.startsWith('local_wordlist_')
-          ),
-          // Note: We don't export actual cached wordlist data to keep file size reasonable
-          cacheInfo: `${Object.keys(localStorage).length} cached items`
-        },
-        usageLog: usageLog,
-        statistics: {
-          totalEmails: usageLog.length,
-          uniqueDomains: [...new Set(usageLog.map(entry => entry.domain))].length,
-          dateRange: usageLog.length > 0 ? {
-            first: usageLog.reduce((min, entry) => entry.date < min ? entry.date : min, usageLog[0].date),
-            last: usageLog.reduce((max, entry) => entry.date > max ? entry.date : max, usageLog[0].date)
-          } : null
-        }
-      };
-
-      if (usageLog.length === 0 && !exportData.settings.catchAllDomain) {
+      if (exportData.usageLog.length === 0 && !exportData.settings.catchAllDomain) {
         throw new Error('No data to export');
       }
 
@@ -509,6 +516,19 @@ const ExportUtils = {
         
         if (data.settings.wordlistUrl) {
           settingsToImport[CONFIG.STORAGE_KEYS.WORDLIST_URL] = data.settings.wordlistUrl;
+        }
+
+        // Import GitHub settings (excluding PAT)
+        if (data.settings.githubRepository) {
+          settingsToImport[CONFIG.STORAGE_KEYS.GITHUB_REPOSITORY] = data.settings.githubRepository;
+        }
+        
+        if (data.settings.githubBranch) {
+          settingsToImport[CONFIG.STORAGE_KEYS.GITHUB_BRANCH] = data.settings.githubBranch;
+        }
+        
+        if (data.settings.hasOwnProperty('githubAutoBackup')) {
+          settingsToImport[CONFIG.STORAGE_KEYS.GITHUB_AUTO_BACKUP] = data.settings.githubAutoBackup;
         }
 
         await StorageUtils.set(settingsToImport);

@@ -22,6 +22,12 @@ class OptionsController {
     document.getElementById('save-wordlist-url').addEventListener('click', () => this.handleSaveWordlistUrl());
     document.getElementById('reload-wordlist').addEventListener('click', () => this.handleReloadWordlist());
 
+    // GitHub backup settings
+    document.getElementById('test-github-connection').addEventListener('click', () => this.handleTestGitHubConnection());
+    document.getElementById('save-github-config').addEventListener('click', () => this.handleSaveGitHubConfig());
+    document.getElementById('manual-backup').addEventListener('click', () => this.handleManualBackup());
+    document.getElementById('show-github-help').addEventListener('click', (e) => this.toggleGitHubHelp(e));
+
     // Export/Import functions
     document.getElementById('export-backup').addEventListener('click', () => this.handleExportBackup());
     document.getElementById('import-backup').addEventListener('click', () => this.handleImportBackup());
@@ -37,6 +43,8 @@ class OptionsController {
     await this.loadDomainSettings();
     await this.setupWordlistDropdown();
     await this.updateWordlistStatus();
+    await this.loadGitHubSettings();
+    await this.updateGitHubStatus();
     await this.loadLogData();
   }
 
@@ -198,6 +206,141 @@ class OptionsController {
     }
   }
 
+  async loadGitHubSettings() {
+    try {
+      const config = await GitHubBackup.getConfig();
+      
+      document.getElementById('github-pat').value = config.pat;
+      document.getElementById('github-repository').value = config.repository;
+      document.getElementById('github-branch').value = config.branch;
+      document.getElementById('github-auto-backup').checked = config.autoBackup;
+    } catch (error) {
+      console.error("Error loading GitHub settings:", error);
+    }
+  }
+
+  async updateGitHubStatus() {
+    try {
+      const isConfigured = await GitHubBackup.isConfigured();
+      const statusElement = document.getElementById('github-connection-status');
+      const backupInfo = document.getElementById('backup-info');
+
+      if (isConfigured) {
+        statusElement.textContent = 'Configured';
+        statusElement.style.color = '#4CAF50';
+        backupInfo.style.display = 'block';
+
+        // Load last backup info
+        const lastBackup = await GitHubBackup.getLastBackupInfo();
+        document.getElementById('last-backup-date').textContent = 
+          lastBackup.lastDate ? new Date(lastBackup.lastDate).toLocaleString() : 'Never';
+
+        if (lastBackup.lastError) {
+          document.getElementById('last-backup-status').textContent = 'Error: ' + lastBackup.lastError;
+          document.getElementById('last-backup-status').style.color = '#f44336';
+        } else if (lastBackup.lastUrl) {
+          document.getElementById('last-backup-status').textContent = 'Success';
+          document.getElementById('last-backup-status').style.color = '#4CAF50';
+          document.getElementById('last-backup-link').href = lastBackup.lastUrl;
+          document.getElementById('last-backup-link-container').style.display = 'block';
+        } else {
+          document.getElementById('last-backup-status').textContent = 'Not backed up yet';
+          document.getElementById('last-backup-status').style.color = '#757575';
+        }
+      } else {
+        statusElement.textContent = 'Not configured';
+        statusElement.style.color = '#757575';
+        backupInfo.style.display = 'none';
+      }
+    } catch (error) {
+      console.error("Error updating GitHub status:", error);
+    }
+  }
+
+  async handleTestGitHubConnection() {
+    try {
+      const config = this.getGitHubConfigFromForm();
+      const errors = await GitHubBackup.validateConfig(config);
+
+      if (errors.length > 0) {
+        this.showStatus('Configuration errors: ' + errors.join(', '), true);
+        return;
+      }
+
+      this.showStatus('Testing connection...');
+      const result = await GitHubBackup.testConnection(config);
+
+      if (result.success) {
+        this.showStatus('Connection successful!');
+      } else {
+        this.showStatus('Connection failed: ' + result.error, true);
+      }
+    } catch (error) {
+      console.error('Error testing GitHub connection:', error);
+      this.showStatus('Error testing connection: ' + error.message, true);
+    }
+  }
+
+  async handleSaveGitHubConfig() {
+    try {
+      const config = this.getGitHubConfigFromForm();
+      const errors = await GitHubBackup.validateConfig(config);
+
+      if (errors.length > 0) {
+        this.showStatus('Please fix the following errors: ' + errors.join(', '), true);
+        return;
+      }
+
+      await StorageUtils.set({
+        [CONFIG.STORAGE_KEYS.GITHUB_PAT]: config.pat,
+        [CONFIG.STORAGE_KEYS.GITHUB_REPOSITORY]: config.repository,
+        [CONFIG.STORAGE_KEYS.GITHUB_BRANCH]: config.branch,
+        [CONFIG.STORAGE_KEYS.GITHUB_AUTO_BACKUP]: config.autoBackup
+      });
+
+      this.showStatus('GitHub configuration saved!');
+      await this.updateGitHubStatus();
+    } catch (error) {
+      console.error('Error saving GitHub config:', error);
+      this.showStatus('Error saving configuration: ' + error.message, true);
+    }
+  }
+
+  async handleManualBackup() {
+    try {
+      const isConfigured = await GitHubBackup.isConfigured();
+      if (!isConfigured) {
+        this.showStatus('Please configure GitHub settings first', true);
+        return;
+      }
+
+      this.showStatus('Creating backup...');
+      const result = await GitHubBackup.manualBackup();
+
+      this.showStatus('Backup created successfully!');
+      await this.updateGitHubStatus();
+    } catch (error) {
+      console.error('Error creating manual backup:', error);
+      this.showStatus('Backup failed: ' + error.message, true);
+      await this.updateGitHubStatus();
+    }
+  }
+
+  getGitHubConfigFromForm() {
+    return {
+      pat: document.getElementById('github-pat').value.trim(),
+      repository: document.getElementById('github-repository').value.trim(),
+      branch: document.getElementById('github-branch').value.trim() || 'main',
+      autoBackup: document.getElementById('github-auto-backup').checked
+    };
+  }
+
+  toggleGitHubHelp(event) {
+    event.preventDefault();
+    const helpSection = document.getElementById('github-help');
+    helpSection.style.display = helpSection.style.display === 'none' ? 'block' : 'none';
+  }
+
   async handleExportBackup() {
     try {
       await ExportUtils.exportAsJson();
@@ -249,6 +392,8 @@ class OptionsController {
       await this.loadDomainSettings();
       await this.setupWordlistDropdown();
       await this.updateWordlistStatus();
+      await this.loadGitHubSettings();
+      await this.updateGitHubStatus();
       await this.loadLogData();
       await this.updateExampleEmail(document.getElementById('domain').value);
 
@@ -277,6 +422,7 @@ class OptionsController {
       if (data.settings.catchAllDomain) lines.push(`  • Domain: ${data.settings.catchAllDomain}`);
       if (data.settings.wordlistSelection) lines.push(`  • Wordlist: ${data.settings.wordlistSelection}`);
       if (data.settings.wordlistUrl) lines.push(`  • Custom URL: ${data.settings.wordlistUrl}`);
+      if (data.settings.githubRepository) lines.push(`  • GitHub Repo: ${data.settings.githubRepository}`);
     }
     
     if (data.usageLog) {

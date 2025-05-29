@@ -62,6 +62,72 @@
   </div>
 
   <div class="card">
+    <h2 class="options-h2">GitHub Auto-Backup</h2>
+    <p>Automatically backup your settings and email history to a GitHub repository.</p>
+    
+    <div id="github-status" class="status-info">
+      <strong>Status:</strong> <span id="github-connection-status">Not configured</span>
+    </div>
+
+    <div class="form-group">
+      <label for="github-pat">GitHub Personal Access Token:</label>
+      <input type="password" id="github-pat" class="options-input" placeholder="ghp_xxxxxxxxxxxxxxxxxxxx">
+      <p class="text-muted">
+        Create a <a href="https://github.com/settings/tokens" target="_blank">Personal Access Token</a> with 'repo' permissions.
+        <a href="#" id="show-github-help">Need help?</a>
+      </p>
+    </div>
+
+    <div class="form-group">
+      <label for="github-repository">Repository (owner/repo):</label>
+      <input type="text" id="github-repository" class="options-input" placeholder="username/my-backup-repo">
+      <p class="text-muted">The repository must exist and be accessible with your token.</p>
+    </div>
+
+    <div class="form-group">
+      <label for="github-branch">Branch:</label>
+      <input type="text" id="github-branch" class="options-input" placeholder="main" value="main">
+      <p class="text-muted">The branch to commit backups to.</p>
+    </div>
+
+    <div class="form-group checkbox-group">
+      <input type="checkbox" id="github-auto-backup">
+      <label for="github-auto-backup">Enable automatic backups</label>
+      <p class="text-muted">Automatically backup when generating new emails.</p>
+    </div>
+
+    <div class="button-row">
+      <button id="test-github-connection" class="secondary"><i class="fas fa-link"></i> Test Connection</button>
+      <button id="save-github-config"><i class="fas fa-save"></i> Save Configuration</button>
+      <button id="manual-backup" class="secondary"><i class="fas fa-cloud-upload-alt"></i> Backup Now</button>
+    </div>
+
+    <div id="github-help" class="help-section" style="display: none;">
+      <h4>Setting up GitHub Backup:</h4>
+      <ol>
+        <li>Go to <a href="https://github.com/settings/tokens" target="_blank">GitHub Settings → Developer settings → Personal access tokens</a></li>
+        <li>Click "Generate new token (classic)"</li>
+        <li>Give it a descriptive name like "Email Extension Backup"</li>
+        <li>Select the "repo" scope (full control of private repositories)</li>
+        <li>Click "Generate token" and copy the token</li>
+        <li>Create a repository for your backups (can be private)</li>
+        <li>Enter the token and repository details above</li>
+      </ol>
+    </div>
+
+    <div id="backup-info" class="backup-info" style="display: none;">
+      <h4>Last Backup:</h4>
+      <div id="last-backup-details">
+        <div><strong>Date:</strong> <span id="last-backup-date">Never</span></div>
+        <div><strong>Status:</strong> <span id="last-backup-status">-</span></div>
+        <div id="last-backup-link-container" style="display: none;">
+          <strong>File:</strong> <a id="last-backup-link" target="_blank">View on GitHub</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
     <h2 class="options-h2">Backup & Restore</h2>
     <p>Export your settings and email history, or restore from a previous backup.</p>
 
@@ -108,6 +174,7 @@
   <script src="../js/config.js"></script>
   <script src="../js/browser-polyfill.js"></script>
   <script src="../js/utils.js"></script>
+  <script src="../js/github-backup.js"></script>
   <script src="../js/options.js"></script>
 </body>
 </html>

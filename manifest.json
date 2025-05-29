@@ -26,7 +26,8 @@
       "src/js/config.js",
       "src/js/browser-polyfill.js",
       "src/js/utils.js",
-      "src/js/background.js"
+      "src/js/background.js",
+      "src/js/github-backup.js"
     ],
     "persistent": false
   },
@@ -39,7 +40,8 @@
         "src/js/config.js",
         "src/js/browser-polyfill.js",
         "src/js/utils.js",
-        "src/js/content.js"
+        "src/js/content.js",
+        "src/js/github-backup.js"
       ],
       "run_at": "document_idle",
       "all_frames": true

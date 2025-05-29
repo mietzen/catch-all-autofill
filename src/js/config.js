@@ -47,14 +47,21 @@ const CONFIG = {
     CUSTOM_KEY: 'custom'
   },
 
-
   // Storage keys
   STORAGE_KEYS: {
     CATCH_ALL_DOMAIN: 'catchAllDomain',
-    WORDLIST_SELECTION: 'wordlistSelection', // New: stores 'de', 'en', etc. or 'custom'
-    WORDLIST_URL: 'wordlistUrl', // Only used when selection is 'custom'
+    WORDLIST_SELECTION: 'wordlistSelection',
+    WORDLIST_URL: 'wordlistUrl',
     USAGE_LOG: 'usageLog',
     DATA_VERSION: 'dataVersion',
+    // GitHub backup settings
+    GITHUB_PAT: 'githubPat',
+    GITHUB_REPOSITORY: 'githubRepository',
+    GITHUB_BRANCH: 'githubBranch',
+    GITHUB_AUTO_BACKUP: 'githubAutoBackup',
+    LAST_BACKUP_DATE: 'lastBackupDate',
+    LAST_BACKUP_URL: 'lastBackupUrl',
+    LAST_BACKUP_ERROR: 'lastBackupError'
   },
 
   // Validation

@@ -25,6 +25,7 @@ class BackgroundController {
     browser.contextMenus.onClicked.addListener((info, tab) => this.handleContextMenuClick(info, tab));
     browser.runtime.onInstalled.addListener((details) => this.handleInstallation(details));
     browser.runtime.onMessage.addListener((message, sender, sendResponse) => this.handleMessage(message, sender, sendResponse));
+    browser.storage.onChanged.addListener((changes, area) => this.handleStorageChange(changes, area));
   }
 
   async handleContextMenuClick(info, tab) {
@@ -44,6 +45,8 @@ class BackgroundController {
 
       if (success) {
         await this.logEmailUsage(tab, generatedEmail);
+        // Trigger auto-backup after new email is logged
+        this.triggerAutoBackup();
       }
     } catch (error) {
       console.error("Error handling context menu click:", error);
@@ -117,6 +120,47 @@ class BackgroundController {
       await UsageLogger.log(domain, generatedEmail);
     } catch (error) {
       console.error("Error logging email usage:", error);
+    }
+  }
+
+  async handleStorageChange(changes, area) {
+    if (area !== 'sync') return;
+    
+    // Check if settings changed (trigger auto-backup)
+    const settingsKeys = [
+      CONFIG.STORAGE_KEYS.CATCH_ALL_DOMAIN,
+      CONFIG.STORAGE_KEYS.WORDLIST_SELECTION,
+      CONFIG.STORAGE_KEYS.WORDLIST_URL,
+      CONFIG.STORAGE_KEYS.GITHUB_REPOSITORY,
+      CONFIG.STORAGE_KEYS.GITHUB_BRANCH,
+      CONFIG.STORAGE_KEYS.GITHUB_AUTO_BACKUP,
+      CONFIG.STORAGE_KEYS.USAGE_LOG
+    ];
+    
+    const hasSettingsChange = settingsKeys.some(key => changes.hasOwnProperty(key));
+    
+    if (hasSettingsChange) {
+      this.triggerAutoBackup();
+    }
+  }
+
+  async triggerAutoBackup() {
+    try {
+      // Debounce backup calls to avoid rapid successive backups
+      if (this.backupTimeout) {
+        clearTimeout(this.backupTimeout);
+      }
+      
+      this.backupTimeout = setTimeout(async () => {
+        try {
+          await GitHubBackup.performAutoBackup();
+        } catch (error) {
+          console.error('Auto-backup failed:', error);
+          // Don't show notification for auto-backup failures to avoid spam
+        }
+      }, 2000); // Wait 2 seconds before backing up
+    } catch (error) {
+      console.error('Error triggering auto-backup:', error);
     }
   }
 
