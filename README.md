@@ -72,8 +72,6 @@ Install directly from the Firefox Add-ons store.
 
 ## Todo
 
-- Json export should save all settings!
-- Json import
 - Github backup option (Json export) <https://stackoverflow.com/a/69290756/6847446> (GraphQL)
 
   Buttons:

@@ -61,11 +61,25 @@
     </div>
   </div>
 
-  <h2 class="options-h2">Generated Email Addresses</h2>
+  <div class="card">
+    <h2 class="options-h2">Backup & Restore</h2>
+    <p>Export your settings and email history, or restore from a previous backup.</p>
 
-  <div class="button-row">
-    <button id="download-json" class="secondary">Export as JSON</button>
+    <div class="button-row">
+      <button id="export-backup" class="secondary"><i class="fas fa-download"></i> Export Backup</button>
+      <button id="import-backup" class="secondary"><i class="fas fa-upload"></i> Import Backup</button>
+    </div>
+
+    <input type="file" id="import-file" accept=".json" style="display: none;">
+    
+    <div id="import-status" class="import-status" style="display: none;">
+      <div class="import-progress">
+        <div class="import-details"></div>
+      </div>
+    </div>
   </div>
+
+  <h2 class="options-h2">Generated Email Addresses</h2>
 
   <div class="log-container">
     <div class="log-filters">

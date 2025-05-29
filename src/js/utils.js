@@ -425,16 +425,109 @@ const ValidationUtils = {
 /**
  * Export management
  */
+/**
+ * Export management
+ */
 const ExportUtils = {
   async exportAsJson() {
-    const usageLog = await UsageLogger.getLog();
-    if (usageLog.length === 0) {
-      throw new Error('No data to export');
-    }
+    try {
+      // Get all extension data
+      const [usageLog, syncStorage, localStorage] = await Promise.all([
+        UsageLogger.getLog(),
+        StorageUtils.get(null), // Get all sync storage
+        StorageUtils.getLocal(null) // Get all local storage
+      ]);
 
-    const data = JSON.stringify(usageLog, null, 2);
-    const filename = `email_log_${new Date().toISOString().slice(0, 10)}.json`;
-    UIUtils.downloadFile(data, filename, 'application/json');
+      // Prepare export data
+      const exportData = {
+        metadata: {
+          exportDate: new Date().toISOString(),
+          version: CONFIG.DATA_VERSION,
+          extensionId: CONFIG.EXTENSION_ID
+        },
+        settings: {
+          // Core settings from sync storage
+          catchAllDomain: syncStorage[CONFIG.STORAGE_KEYS.CATCH_ALL_DOMAIN] || '',
+          wordlistSelection: syncStorage[CONFIG.STORAGE_KEYS.WORDLIST_SELECTION] || CONFIG.WORDLISTS.DEFAULT,
+          wordlistUrl: syncStorage[CONFIG.STORAGE_KEYS.WORDLIST_URL] || '',
+          dataVersion: syncStorage[CONFIG.STORAGE_KEYS.DATA_VERSION] || CONFIG.DATA_VERSION
+        },
+        cache: {
+          // Local storage cache data (wordlists, etc.)
+          localStorageKeys: Object.keys(localStorage).filter(key => 
+            key.startsWith('wordlist_') || key.startsWith('local_wordlist_')
+          ),
+          // Note: We don't export actual cached wordlist data to keep file size reasonable
+          cacheInfo: `${Object.keys(localStorage).length} cached items`
+        },
+        usageLog: usageLog,
+        statistics: {
+          totalEmails: usageLog.length,
+          uniqueDomains: [...new Set(usageLog.map(entry => entry.domain))].length,
+          dateRange: usageLog.length > 0 ? {
+            first: usageLog.reduce((min, entry) => entry.date < min ? entry.date : min, usageLog[0].date),
+            last: usageLog.reduce((max, entry) => entry.date > max ? entry.date : max, usageLog[0].date)
+          } : null
+        }
+      };
+
+      if (usageLog.length === 0 && !exportData.settings.catchAllDomain) {
+        throw new Error('No data to export');
+      }
+
+      const data = JSON.stringify(exportData, null, 2);
+      const filename = `catch_all_email_backup_${new Date().toISOString().slice(0, 10)}.json`;
+      UIUtils.downloadFile(data, filename, 'application/json');
+      
+      return exportData;
+    } catch (error) {
+      console.error('Export error:', error);
+      throw error;
+    }
+  },
+
+  async importFromJson(jsonData) {
+    try {
+      const data = typeof jsonData === 'string' ? JSON.parse(jsonData) : jsonData;
+      
+      // Validate import data structure
+      if (!data.settings && !data.usageLog) {
+        throw new Error('Invalid backup file format');
+      }
+
+      // Import settings
+      if (data.settings) {
+        const settingsToImport = {};
+        
+        if (data.settings.catchAllDomain) {
+          settingsToImport[CONFIG.STORAGE_KEYS.CATCH_ALL_DOMAIN] = data.settings.catchAllDomain;
+        }
+        
+        if (data.settings.wordlistSelection) {
+          settingsToImport[CONFIG.STORAGE_KEYS.WORDLIST_SELECTION] = data.settings.wordlistSelection;
+        }
+        
+        if (data.settings.wordlistUrl) {
+          settingsToImport[CONFIG.STORAGE_KEYS.WORDLIST_URL] = data.settings.wordlistUrl;
+        }
+
+        await StorageUtils.set(settingsToImport);
+      }
+
+      // Import usage log
+      if (data.usageLog && Array.isArray(data.usageLog)) {
+        await StorageUtils.set({ [CONFIG.STORAGE_KEYS.USAGE_LOG]: data.usageLog });
+      }
+
+      return {
+        settingsImported: Object.keys(data.settings || {}).length,
+        emailsImported: (data.usageLog || []).length
+      };
+
+    } catch (error) {
+      console.error('Import error:', error);
+      throw new Error('Failed to import backup: ' + error.message);
+    }
   }
 };
 

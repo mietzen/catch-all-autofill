@@ -22,8 +22,10 @@ class OptionsController {
     document.getElementById('save-wordlist-url').addEventListener('click', () => this.handleSaveWordlistUrl());
     document.getElementById('reload-wordlist').addEventListener('click', () => this.handleReloadWordlist());
 
-    // Export functions
-    document.getElementById('download-json').addEventListener('click', () => this.handleExportJson());
+    // Export/Import functions
+    document.getElementById('export-backup').addEventListener('click', () => this.handleExportBackup());
+    document.getElementById('import-backup').addEventListener('click', () => this.handleImportBackup());
+    document.getElementById('import-file').addEventListener('change', (e) => this.handleFileSelected(e));
 
     // History management
     document.getElementById('filter-domain').addEventListener('input', (e) => this.loadLogData(e.target.value));
@@ -38,7 +40,7 @@ class OptionsController {
     await this.loadLogData();
   }
 
-async setupWordlistDropdown() {
+  async setupWordlistDropdown() {
     const dropdown = document.getElementById('wordlist-selection');
     dropdown.innerHTML = '';
 
@@ -196,6 +198,107 @@ async setupWordlistDropdown() {
     }
   }
 
+  async handleExportBackup() {
+    try {
+      await ExportUtils.exportAsJson();
+      this.showStatus("Backup exported successfully!");
+    } catch (error) {
+      console.error("Error exporting backup:", error);
+      this.showStatus(error.message === 'No data to export' ? error.message : "Error exporting backup", true);
+    }
+  }
+
+  handleImportBackup() {
+    document.getElementById('import-file').click();
+  }
+
+  async handleFileSelected(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    if (!file.name.endsWith('.json')) {
+      this.showStatus("Please select a JSON file", true);
+      return;
+    }
+
+    try {
+      this.showImportStatus("Reading backup file...");
+      
+      const text = await file.text();
+      const data = JSON.parse(text);
+      
+      // Validate backup structure
+      if (!data.settings && !data.usageLog && !data.metadata) {
+        throw new Error("Invalid backup file format");
+      }
+
+      // Show confirmation dialog with import details
+      const confirmMessage = this.buildImportConfirmation(data);
+      if (!confirm(confirmMessage)) {
+        this.hideImportStatus();
+        return;
+      }
+
+      this.showImportStatus("Importing settings...");
+      
+      const result = await ExportUtils.importFromJson(data);
+      
+      this.showImportStatus("Refreshing interface...");
+      
+      // Refresh the UI
+      await this.loadDomainSettings();
+      await this.setupWordlistDropdown();
+      await this.updateWordlistStatus();
+      await this.loadLogData();
+      await this.updateExampleEmail(document.getElementById('domain').value);
+
+      this.hideImportStatus();
+      this.showStatus(`Import successful! ${result.settingsImported} settings and ${result.emailsImported} emails imported.`);
+
+    } catch (error) {
+      console.error("Error importing backup:", error);
+      this.hideImportStatus();
+      this.showStatus("Error importing backup: " + error.message, true);
+    }
+
+    // Clear file input
+    event.target.value = '';
+  }
+
+  buildImportConfirmation(data) {
+    const lines = ["Import the following data?", ""];
+    
+    if (data.metadata) {
+      lines.push(`Export Date: ${new Date(data.metadata.exportDate).toLocaleString()}`);
+    }
+    
+    if (data.settings) {
+      lines.push("Settings to import:");
+      if (data.settings.catchAllDomain) lines.push(`  • Domain: ${data.settings.catchAllDomain}`);
+      if (data.settings.wordlistSelection) lines.push(`  • Wordlist: ${data.settings.wordlistSelection}`);
+      if (data.settings.wordlistUrl) lines.push(`  • Custom URL: ${data.settings.wordlistUrl}`);
+    }
+    
+    if (data.usageLog) {
+      lines.push(`Email History: ${data.usageLog.length} entries`);
+    }
+    
+    lines.push("", "⚠️ This will overwrite your current settings!");
+    
+    return lines.join("\n");
+  }
+
+  showImportStatus(message) {
+    const statusDiv = document.getElementById('import-status');
+    const detailsDiv = statusDiv.querySelector('.import-details');
+    detailsDiv.textContent = message;
+    statusDiv.style.display = 'block';
+  }
+
+  hideImportStatus() {
+    document.getElementById('import-status').style.display = 'none';
+  }
+
   showStatus(message, isError = false) {
     const statusElement = document.getElementById('status');
     statusElement.textContent = message;
@@ -253,16 +356,6 @@ async setupWordlistDropdown() {
     } catch (error) {
       document.getElementById('example-email').textContent =
         `word_word_123@${exampleDomain}`;
-    }
-  }
-
-  async handleExportJson() {
-    try {
-      await ExportUtils.exportAsJson();
-      this.showStatus("JSON file downloaded");
-    } catch (error) {
-      console.error("Error downloading JSON:", error);
-      this.showStatus(error.message === 'No data to export' ? error.message : "Error downloading file", true);
     }
   }
 
