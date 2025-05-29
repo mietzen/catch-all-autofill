@@ -72,17 +72,8 @@ Install directly from the Firefox Add-ons store.
 
 ## Todo
 
-- Github backup option (Json export) <https://stackoverflow.com/a/69290756/6847446> (GraphQL)
-
-  Buttons:
-  - Save (saves the config)
-  - Backup (commits the config)
-
-  Settings:
-  - branch (default: main)
-  - repository (name with owner, e.g.: demo-githubs/test)
-  - PAT (Should be excluded from backup!)
-
+- Github Backup is still a little bit ruff
+- Add domain instead of 2nd word option
 - Make html nicer
 - Port to Chrome
 - Screenshots / screencast
