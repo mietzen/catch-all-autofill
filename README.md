@@ -72,18 +72,16 @@ Install directly from the Firefox Add-ons store.
 
 ## Todo
 
-- Github backup option (Json export) <https://stackoverflow.com/a/69290756/6847446> (GraphQL)
-
-  Buttons:
-  - Save (saves the config)
-  - Backup (commits the config)
-
-  Settings:
-  - branch (default: main)
-  - repository (name with owner, e.g.: demo-githubs/test)
-  - PAT (Should be excluded from backup!)
-
+- Add domain instead of 2nd word option
 - Make html nicer
+  - Options:
+    - Status in the lower right corner
+    - Box around Generated Email Addresses
+    - Less space above H2 headings
+  - Popup
+    - Newly generated addresses should have the copy symbol trailing like in the list "Generated for this Domain:"
+    - Copy to clipboard button should be removed
+    - Copy to clipboard status should be signaled via green symbol the text should be removed
 - Port to Chrome
 - Screenshots / screencast
 - Test Sync

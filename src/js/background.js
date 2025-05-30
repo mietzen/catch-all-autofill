@@ -82,8 +82,6 @@ class BackgroundController {
     return `
       (async function() {
         const generatedEmail = "${generatedEmail}";
-        
-        // Insert the email into the active element if it's an input field
         const activeElement = document.activeElement;
         if (activeElement && 
             (activeElement.tagName === 'INPUT' || 
@@ -97,8 +95,6 @@ class BackgroundController {
             range.insertNode(document.createTextNode(generatedEmail));
           } else {
             activeElement.value = generatedEmail;
-            
-            // Fire input and change events to ensure form validation is triggered
             activeElement.dispatchEvent(new Event('input', { bubbles: true }));
             activeElement.dispatchEvent(new Event('change', { bubbles: true }));
           }
@@ -150,7 +146,6 @@ class BackgroundController {
     if (!currentVersion || currentVersion < 2) {
       await this.migrateUsageLogFormat();
     }
-    // Add future migrations here as needed
   }
 
   async migrateUsageLogFormat() {
@@ -197,6 +192,4 @@ class BackgroundController {
     });
   }
 }
-
-// Initialize background controller
 new BackgroundController();

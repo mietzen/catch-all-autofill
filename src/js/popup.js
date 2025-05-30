@@ -133,6 +133,4 @@ class PopupController {
     browser.runtime.openOptionsPage();
   }
 }
-
-// Initialize popup controller
 new PopupController();

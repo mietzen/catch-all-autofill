@@ -1,12 +1,10 @@
-/**
- * Refactored content script that runs on webpages to inject icons into email fields
- */
+
 
 
 class EmailFieldProcessor {
   constructor() {
     this.processedFields = new WeakSet();
-    this.injectFontAwesome(); // Add this line
+    this.injectFontAwesome();
     this.init();
   }
 
@@ -190,8 +188,6 @@ class EmailFieldProcessor {
   fillEmailField(emailField, email) {
     emailField.value = email;
     emailField.focus();
-
-    // Trigger events for form validation
     emailField.dispatchEvent(new Event('input', { bubbles: true }));
     emailField.dispatchEvent(new Event('change', { bubbles: true }));
   }
@@ -225,11 +221,7 @@ class EmailFieldProcessor {
         icon.style.opacity = '0.7';
       }
     });
-
-    // Set initial opacity
     icon.style.opacity = emailField.value ? '1' : '0.7';
   }
 }
-
-// Initialize the processor
 new EmailFieldProcessor();

@@ -13,21 +13,14 @@ class OptionsController {
   }
 
   setupEventListeners() {
-    // Domain settings
     document.getElementById('save').addEventListener('click', () => this.handleSaveDomain());
     document.getElementById('domain').addEventListener('input', (e) => this.updateExampleEmail(e.target.value.trim()));
-
-    // Wordlist settings
     document.getElementById('wordlist-selection').addEventListener('change', (e) => this.handleWordlistSelectionChange(e.target.value));
     document.getElementById('save-wordlist-url').addEventListener('click', () => this.handleSaveWordlistUrl());
     document.getElementById('reload-wordlist').addEventListener('click', () => this.handleReloadWordlist());
-
-    // Export/Import functions
     document.getElementById('export-backup').addEventListener('click', () => this.handleExportBackup());
     document.getElementById('import-backup').addEventListener('click', () => this.handleImportBackup());
     document.getElementById('import-file').addEventListener('change', (e) => this.handleFileSelected(e));
-
-    // History management
     document.getElementById('filter-domain').addEventListener('input', (e) => this.loadLogData(e.target.value));
     document.getElementById('clear-filter').addEventListener('click', () => this.handleClearFilter());
     document.getElementById('clear-history').addEventListener('click', () => this.handleClearHistory());
@@ -43,22 +36,16 @@ class OptionsController {
   async setupWordlistDropdown() {
     const dropdown = document.getElementById('wordlist-selection');
     dropdown.innerHTML = '';
-
-    // Add local wordlist options
     CONFIG.WORDLISTS.AVAILABLE.forEach(wordlist => {
       const option = document.createElement('option');
       option.value = wordlist.code;
       option.textContent = wordlist.name;
       dropdown.appendChild(option);
     });
-
-    // Add custom option
     const customOption = document.createElement('option');
     customOption.value = CONFIG.WORDLISTS.CUSTOM_KEY;
     customOption.textContent = 'Custom URL';
     dropdown.appendChild(customOption);
-
-    // Load current selection
     const currentSelection = await WordlistManager.getCurrentSelection();
     dropdown.value = currentSelection;
     
@@ -66,7 +53,6 @@ class OptionsController {
   }
 
   getFlagEmoji(countryCode) {
-    // Convert country code to flag emoji
     const codePoints = countryCode
       .toUpperCase()
       .split('')
@@ -93,7 +79,6 @@ class OptionsController {
       this.toggleCustomUrlField(selection === CONFIG.WORDLISTS.CUSTOM_KEY);
       
       if (selection !== CONFIG.WORDLISTS.CUSTOM_KEY) {
-        // Save local wordlist selection immediately
         await StorageUtils.set({ [CONFIG.STORAGE_KEYS.WORDLIST_SELECTION]: selection });
         WordlistManager.clearCache();
         await this.updateWordlistStatus();
@@ -183,8 +168,6 @@ class OptionsController {
 
       document.getElementById('wordlist-preview').textContent =
         wordlist.slice(0, 5).join(', ') + (wordlist.length > 5 ? '...' : '');
-
-      // Update custom URL field if custom is selected
       if (selection === CONFIG.WORDLISTS.CUSTOM_KEY) {
         const { [CONFIG.STORAGE_KEYS.WORDLIST_URL]: customUrl = '' } =
           await StorageUtils.get(CONFIG.STORAGE_KEYS.WORDLIST_URL);
@@ -226,13 +209,9 @@ class OptionsController {
       
       const text = await file.text();
       const data = JSON.parse(text);
-      
-      // Validate backup structure
       if (!data.settings && !data.usageLog && !data.metadata) {
         throw new Error("Invalid backup file format");
       }
-
-      // Show confirmation dialog with import details
       const confirmMessage = this.buildImportConfirmation(data);
       if (!confirm(confirmMessage)) {
         this.hideImportStatus();
@@ -244,8 +223,6 @@ class OptionsController {
       const result = await ExportUtils.importFromJson(data);
       
       this.showImportStatus("Refreshing interface...");
-      
-      // Refresh the UI
       await this.loadDomainSettings();
       await this.setupWordlistDropdown();
       await this.updateWordlistStatus();
@@ -260,8 +237,6 @@ class OptionsController {
       this.hideImportStatus();
       this.showStatus("Error importing backup: " + error.message, true);
     }
-
-    // Clear file input
     event.target.value = '';
   }
 
@@ -423,24 +398,16 @@ class OptionsController {
 
   createLogRow(entry) {
     const row = document.createElement('tr');
-
-    // Email column
     const emailCell = document.createElement('td');
     emailCell.textContent = entry.generatedEmail;
     row.appendChild(emailCell);
-
-    // Domain column
     const domainCell = document.createElement('td');
     domainCell.textContent = entry.domain;
     row.appendChild(domainCell);
-
-    // Date column
     const dateCell = document.createElement('td');
     const date = new Date(entry.date);
     dateCell.textContent = date.toLocaleString();
     row.appendChild(dateCell);
-
-    // Actions column
     const actionsCell = this.createActionsCell(entry);
     row.appendChild(actionsCell);
 
@@ -450,8 +417,6 @@ class OptionsController {
   createActionsCell(entry) {
     const actionsCell = document.createElement('td');
     actionsCell.className = 'actions';
-
-    // Copy button
     const copyButton = this.createActionButton(
       CONFIG.ICON.COPY_GLYPH,
       'Copy email',
@@ -461,8 +426,6 @@ class OptionsController {
       }
     );
     actionsCell.appendChild(copyButton);
-
-    // Delete button
     const deleteButton = this.createActionButton(
       CONFIG.ICON.DELETE_GLYPH,
       'Delete entry',
@@ -495,6 +458,4 @@ class OptionsController {
     }
   }
 }
-
-// Initialize options controller
 new OptionsController();
