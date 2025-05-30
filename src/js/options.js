@@ -13,27 +13,19 @@ class OptionsController {
   }
 
   setupEventListeners() {
-    // Domain settings
     document.getElementById('save').addEventListener('click', () => this.handleSaveDomain());
     document.getElementById('domain').addEventListener('input', (e) => this.updateExampleEmail(e.target.value.trim()));
 
-    // Wordlist settings
     document.getElementById('wordlist-selection').addEventListener('change', (e) => this.handleWordlistSelectionChange(e.target.value));
     document.getElementById('save-wordlist-url').addEventListener('click', () => this.handleSaveWordlistUrl());
     document.getElementById('reload-wordlist').addEventListener('click', () => this.handleReloadWordlist());
 
-    // GitHub backup settings
-    document.getElementById('test-github-connection').addEventListener('click', () => this.handleTestGitHubConnection());
     document.getElementById('save-github-config').addEventListener('click', () => this.handleSaveGitHubConfig());
-    document.getElementById('manual-backup').addEventListener('click', () => this.handleManualBackup());
-    document.getElementById('show-github-help').addEventListener('click', (e) => this.toggleGitHubHelp(e));
 
-    // Export/Import functions
     document.getElementById('export-backup').addEventListener('click', () => this.handleExportBackup());
     document.getElementById('import-backup').addEventListener('click', () => this.handleImportBackup());
     document.getElementById('import-file').addEventListener('change', (e) => this.handleFileSelected(e));
 
-    // History management
     document.getElementById('filter-domain').addEventListener('input', (e) => this.loadLogData(e.target.value));
     document.getElementById('clear-filter').addEventListener('click', () => this.handleClearFilter());
     document.getElementById('clear-history').addEventListener('click', () => this.handleClearHistory());
@@ -52,7 +44,6 @@ class OptionsController {
     const dropdown = document.getElementById('wordlist-selection');
     dropdown.innerHTML = '';
 
-    // Add local wordlist options
     CONFIG.WORDLISTS.AVAILABLE.forEach(wordlist => {
       const option = document.createElement('option');
       option.value = wordlist.code;
@@ -60,21 +51,18 @@ class OptionsController {
       dropdown.appendChild(option);
     });
 
-    // Add custom option
     const customOption = document.createElement('option');
     customOption.value = CONFIG.WORDLISTS.CUSTOM_KEY;
     customOption.textContent = 'Custom URL';
     dropdown.appendChild(customOption);
 
-    // Load current selection
     const currentSelection = await WordlistManager.getCurrentSelection();
     dropdown.value = currentSelection;
-    
+
     this.toggleCustomUrlField(currentSelection === CONFIG.WORDLISTS.CUSTOM_KEY);
   }
 
   getFlagEmoji(countryCode) {
-    // Convert country code to flag emoji
     const codePoints = countryCode
       .toUpperCase()
       .split('')
@@ -86,7 +74,7 @@ class OptionsController {
     const urlContainer = document.getElementById('custom-url-container');
     const urlField = document.getElementById('wordlist-url');
     const saveButton = document.getElementById('save-wordlist-url');
-    
+
     if (isCustom) {
       urlContainer.style.display = 'block';
       urlField.required = true;
@@ -99,9 +87,8 @@ class OptionsController {
   async handleWordlistSelectionChange(selection) {
     try {
       this.toggleCustomUrlField(selection === CONFIG.WORDLISTS.CUSTOM_KEY);
-      
+
       if (selection !== CONFIG.WORDLISTS.CUSTOM_KEY) {
-        // Save local wordlist selection immediately
         await StorageUtils.set({ [CONFIG.STORAGE_KEYS.WORDLIST_SELECTION]: selection });
         WordlistManager.clearCache();
         await this.updateWordlistStatus();
@@ -137,9 +124,9 @@ class OptionsController {
       this.showStatus("Testing URL...");
       await fetch(url);
 
-      await StorageUtils.set({ 
+      await StorageUtils.set({
         [CONFIG.STORAGE_KEYS.WORDLIST_SELECTION]: CONFIG.WORDLISTS.CUSTOM_KEY,
-        [CONFIG.STORAGE_KEYS.WORDLIST_URL]: url 
+        [CONFIG.STORAGE_KEYS.WORDLIST_URL]: url
       });
 
       WordlistManager.clearCache();
@@ -178,21 +165,20 @@ class OptionsController {
       const info = WordlistManager.getWordlistInfo(selection);
 
       if (info) {
-        const statusText = info.isCustom ? 
-          'Custom URL' : 
+        const statusText = info.isCustom ?
+          'Custom URL' :
           `${this.getFlagEmoji(info.flag)} ${info.name}`;
-        
+
         document.getElementById('wordlist-status').textContent =
           `${statusText} (${wordlist.length} words)`;
       } else {
-        document.getElementById('wordlist-status').textContent = 
+        document.getElementById('wordlist-status').textContent =
           `Unknown (${wordlist.length} words)`;
       }
 
       document.getElementById('wordlist-preview').textContent =
         wordlist.slice(0, 5).join(', ') + (wordlist.length > 5 ? '...' : '');
 
-      // Update custom URL field if custom is selected
       if (selection === CONFIG.WORDLISTS.CUSTOM_KEY) {
         const { [CONFIG.STORAGE_KEYS.WORDLIST_URL]: customUrl = '' } =
           await StorageUtils.get(CONFIG.STORAGE_KEYS.WORDLIST_URL);
@@ -209,11 +195,10 @@ class OptionsController {
   async loadGitHubSettings() {
     try {
       const config = await GitHubBackup.getConfig();
-      
+
       document.getElementById('github-pat').value = config.pat;
       document.getElementById('github-repository').value = config.repository;
       document.getElementById('github-branch').value = config.branch;
-      document.getElementById('github-auto-backup').checked = config.autoBackup;
     } catch (error) {
       console.error("Error loading GitHub settings:", error);
     }
@@ -226,17 +211,33 @@ class OptionsController {
       const backupInfo = document.getElementById('backup-info');
 
       if (isConfigured) {
-        statusElement.textContent = 'Configured';
+        statusElement.textContent = 'Ready for backup';
         statusElement.style.color = '#4CAF50';
         backupInfo.style.display = 'block';
 
-        // Load last backup info
         const lastBackup = await GitHubBackup.getLastBackupInfo();
-        document.getElementById('last-backup-date').textContent = 
+        document.getElementById('last-backup-date').textContent =
           lastBackup.lastDate ? new Date(lastBackup.lastDate).toLocaleString() : 'Never';
 
         if (lastBackup.lastError) {
-          document.getElementById('last-backup-status').textContent = 'Error: ' + lastBackup.lastError;
+          console.log('Error object:', lastBackup.lastError);
+          console.log('Status type:', typeof lastBackup.lastError);
+          let errorMessage = 'Error: ';
+          let error = lastBackup.lastError;
+          try {
+            error = JSON.parse(lastBackup.lastError);
+          } catch (e) {
+            errorMessage += error;
+          }
+
+          if (error.status == 404) {  // Use == to handle both string and number
+            errorMessage += 'Repository or Branch not found!';
+          } else if (error.status == 401) {
+            errorMessage += 'Personal Access Token wrong or insufficient permissions';
+          } else {
+            errorMessage += `(${error.status}) ${error.message || 'Unknown error'}`;
+          }
+          document.getElementById('last-backup-status').textContent = errorMessage;
           document.getElementById('last-backup-status').style.color = '#f44336';
         } else if (lastBackup.lastUrl) {
           document.getElementById('last-backup-status').textContent = 'Success';
@@ -257,28 +258,10 @@ class OptionsController {
     }
   }
 
-  async handleTestGitHubConnection() {
-    try {
-      const config = this.getGitHubConfigFromForm();
-      const errors = await GitHubBackup.validateConfig(config);
-
-      if (errors.length > 0) {
-        this.showStatus('Configuration errors: ' + errors.join(', '), true);
-        return;
-      }
-
-      this.showStatus('Testing connection...');
-      const result = await GitHubBackup.testConnection(config);
-
-      if (result.success) {
-        this.showStatus('Connection successful!');
-      } else {
-        this.showStatus('Connection failed: ' + result.error, true);
-      }
-    } catch (error) {
-      console.error('Error testing GitHub connection:', error);
-      this.showStatus('Error testing connection: ' + error.message, true);
-    }
+  showGitHubStatus(message, isError = false) {
+    const statusElement = document.getElementById('github-connection-status');
+    statusElement.textContent = message;
+    statusElement.style.color = isError ? '#f44336' : '#4CAF50';
   }
 
   async handleSaveGitHubConfig() {
@@ -287,42 +270,26 @@ class OptionsController {
       const errors = await GitHubBackup.validateConfig(config);
 
       if (errors.length > 0) {
-        this.showStatus('Please fix the following errors: ' + errors.join(', '), true);
+        this.showGitHubStatus(errors.join(', '), true);
         return;
       }
 
       await StorageUtils.set({
         [CONFIG.STORAGE_KEYS.GITHUB_PAT]: config.pat,
         [CONFIG.STORAGE_KEYS.GITHUB_REPOSITORY]: config.repository,
-        [CONFIG.STORAGE_KEYS.GITHUB_BRANCH]: config.branch,
-        [CONFIG.STORAGE_KEYS.GITHUB_AUTO_BACKUP]: config.autoBackup
+        [CONFIG.STORAGE_KEYS.GITHUB_BRANCH]: config.branch
       });
 
-      this.showStatus('GitHub configuration saved!');
-      await this.updateGitHubStatus();
+      this.showGitHubStatus('Configuration saved successfully!');
+
+      // Refresh the page after a short delay
+      setTimeout(() => {
+        window.location.reload();
+      }, 1500);
+
     } catch (error) {
       console.error('Error saving GitHub config:', error);
-      this.showStatus('Error saving configuration: ' + error.message, true);
-    }
-  }
-
-  async handleManualBackup() {
-    try {
-      const isConfigured = await GitHubBackup.isConfigured();
-      if (!isConfigured) {
-        this.showStatus('Please configure GitHub settings first', true);
-        return;
-      }
-
-      this.showStatus('Creating backup...');
-      const result = await GitHubBackup.manualBackup();
-
-      this.showStatus('Backup created successfully!');
-      await this.updateGitHubStatus();
-    } catch (error) {
-      console.error('Error creating manual backup:', error);
-      this.showStatus('Backup failed: ' + error.message, true);
-      await this.updateGitHubStatus();
+      this.showGitHubStatus(error.message, true);
     }
   }
 
@@ -330,15 +297,22 @@ class OptionsController {
     return {
       pat: document.getElementById('github-pat').value.trim(),
       repository: document.getElementById('github-repository').value.trim(),
-      branch: document.getElementById('github-branch').value.trim() || 'main',
-      autoBackup: document.getElementById('github-auto-backup').checked
+      branch: document.getElementById('github-branch').value.trim() || 'main'
     };
   }
 
-  toggleGitHubHelp(event) {
-    event.preventDefault();
-    const helpSection = document.getElementById('github-help');
-    helpSection.style.display = helpSection.style.display === 'none' ? 'block' : 'none';
+  showStatus(message, isError = false) {
+    const statusElement = document.getElementById('status');
+    statusElement.textContent = message;
+    statusElement.className = isError ? 'status-error' : 'status-success';
+    statusElement.style.opacity = 1;
+    statusElement.style.transform = 'translateY(0)';
+
+    const delay = isError ? 6000 : 4000;
+    setTimeout(() => {
+      statusElement.style.opacity = 0;
+      statusElement.style.transform = 'translateY(-5px)';
+    }, delay);
   }
 
   async handleExportBackup() {
@@ -366,16 +340,14 @@ class OptionsController {
 
     try {
       this.showImportStatus("Reading backup file...");
-      
+
       const text = await file.text();
       const data = JSON.parse(text);
-      
-      // Validate backup structure
+
       if (!data.settings && !data.usageLog && !data.metadata) {
         throw new Error("Invalid backup file format");
       }
 
-      // Show confirmation dialog with import details
       const confirmMessage = this.buildImportConfirmation(data);
       if (!confirm(confirmMessage)) {
         this.hideImportStatus();
@@ -383,12 +355,11 @@ class OptionsController {
       }
 
       this.showImportStatus("Importing settings...");
-      
+
       const result = await ExportUtils.importFromJson(data);
-      
+
       this.showImportStatus("Refreshing interface...");
-      
-      // Refresh the UI
+
       await this.loadDomainSettings();
       await this.setupWordlistDropdown();
       await this.updateWordlistStatus();
@@ -406,17 +377,16 @@ class OptionsController {
       this.showStatus("Error importing backup: " + error.message, true);
     }
 
-    // Clear file input
     event.target.value = '';
   }
 
   buildImportConfirmation(data) {
     const lines = ["Import the following data?", ""];
-    
+
     if (data.metadata) {
       lines.push(`Export Date: ${new Date(data.metadata.exportDate).toLocaleString()}`);
     }
-    
+
     if (data.settings) {
       lines.push("Settings to import:");
       if (data.settings.catchAllDomain) lines.push(`  • Domain: ${data.settings.catchAllDomain}`);
@@ -424,13 +394,13 @@ class OptionsController {
       if (data.settings.wordlistUrl) lines.push(`  • Custom URL: ${data.settings.wordlistUrl}`);
       if (data.settings.githubRepository) lines.push(`  • GitHub Repo: ${data.settings.githubRepository}`);
     }
-    
+
     if (data.usageLog) {
       lines.push(`Email History: ${data.usageLog.length} entries`);
     }
-    
+
     lines.push("", "⚠️ This will overwrite your current settings!");
-    
+
     return lines.join("\n");
   }
 
@@ -443,17 +413,6 @@ class OptionsController {
 
   hideImportStatus() {
     document.getElementById('import-status').style.display = 'none';
-  }
-
-  showStatus(message, isError = false) {
-    const statusElement = document.getElementById('status');
-    statusElement.textContent = message;
-    statusElement.className = isError ? 'status-error' : '';
-    statusElement.style.opacity = 1;
-
-    setTimeout(() => {
-      statusElement.style.opacity = 0;
-    }, CONFIG.ANIMATION.NOTIFICATION_DURATION);
   }
 
   async loadDomainSettings() {
@@ -570,23 +529,19 @@ class OptionsController {
   createLogRow(entry) {
     const row = document.createElement('tr');
 
-    // Email column
     const emailCell = document.createElement('td');
     emailCell.textContent = entry.generatedEmail;
     row.appendChild(emailCell);
 
-    // Domain column
     const domainCell = document.createElement('td');
     domainCell.textContent = entry.domain;
     row.appendChild(domainCell);
 
-    // Date column
     const dateCell = document.createElement('td');
     const date = new Date(entry.date);
     dateCell.textContent = date.toLocaleString();
     row.appendChild(dateCell);
 
-    // Actions column
     const actionsCell = this.createActionsCell(entry);
     row.appendChild(actionsCell);
 
@@ -597,7 +552,6 @@ class OptionsController {
     const actionsCell = document.createElement('td');
     actionsCell.className = 'actions';
 
-    // Copy button
     const copyButton = this.createActionButton(
       CONFIG.ICON.COPY_GLYPH,
       'Copy email',
@@ -608,7 +562,6 @@ class OptionsController {
     );
     actionsCell.appendChild(copyButton);
 
-    // Delete button
     const deleteButton = this.createActionButton(
       CONFIG.ICON.DELETE_GLYPH,
       'Delete entry',
@@ -642,5 +595,4 @@ class OptionsController {
   }
 }
 
-// Initialize options controller
 new OptionsController();

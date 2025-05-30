@@ -1,12 +1,8 @@
-/**
- * Centralized configuration for the extension
- */
 
 const CONFIG = {
   EXTENSION_ID: 'catch-all-email-extension',
   DATA_VERSION: 2,
 
-  // UI Constants
   ICON: {
     SIZE: 20,
     PADDING: 5,
@@ -16,14 +12,12 @@ const CONFIG = {
     DELETE_GLYPH: '<i class="fas fa-trash"></i>'
   },
 
-  // Animation and timing
   ANIMATION: {
     NOTIFICATION_DURATION: 3000,
     SUCCESS_FEEDBACK_DURATION: 1000,
     TRANSITION_DURATION: 300
   },
 
-  // Email generation
   EMAIL: {
     MIN_DIGITS: 100,
     MAX_DIGITS: 900,
@@ -33,7 +27,6 @@ const CONFIG = {
     MAX_RETRIES: 10
   },
 
-  // Wordlist configuration
   WORDLISTS: {
     DEFAULT: 'en',
     AVAILABLE: [
@@ -47,14 +40,12 @@ const CONFIG = {
     CUSTOM_KEY: 'custom'
   },
 
-  // Storage keys
   STORAGE_KEYS: {
     CATCH_ALL_DOMAIN: 'catchAllDomain',
     WORDLIST_SELECTION: 'wordlistSelection',
     WORDLIST_URL: 'wordlistUrl',
     USAGE_LOG: 'usageLog',
     DATA_VERSION: 'dataVersion',
-    // GitHub backup settings
     GITHUB_PAT: 'githubPat',
     GITHUB_REPOSITORY: 'githubRepository',
     GITHUB_BRANCH: 'githubBranch',
@@ -64,28 +55,24 @@ const CONFIG = {
     LAST_BACKUP_ERROR: 'lastBackupError'
   },
 
-  // Validation
   VALIDATION: {
     MIN_FIELD_WIDTH: 100,
     MIN_FIELD_HEIGHT: 20,
     DOMAIN_REGEX: /^(?:[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?\.)*[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?\.+[a-zA-Z]{2,}$/
   },
 
-  // CSS Classes
   CSS_CLASSES: {
     WRAPPER: 'catch-all-email-extension-wrapper',
     ICON: 'catch-all-email-extension-icon',
     NOTIFICATION: 'catch-all-email-extension-notification'
   },
 
-  // Selectors
   SELECTORS: {
     EMAIL_INPUTS: 'input[autocomplete="email"], input[autocomplete="username"], input[id="email"], input[id="username"], input[name="email"], input[name="username"], input[type="email"]',
     PASSWORD_MANAGER_EXCLUSIONS: '[data-lastpass-icon-root], [data-1password-icon]'
   }
 };
 
-// Make config available globally
 if (typeof module !== 'undefined' && module.exports) {
   module.exports = CONFIG;
 } else if (typeof window !== 'undefined') {

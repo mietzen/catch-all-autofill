@@ -1,6 +1,3 @@
-/**
- * GitHub backup utilities
- */
 const GitHubBackup = {
     async isConfigured() {
         const {
@@ -18,16 +15,14 @@ const GitHubBackup = {
         const {
             [CONFIG.STORAGE_KEYS.GITHUB_PAT]: pat = '',
             [CONFIG.STORAGE_KEYS.GITHUB_REPOSITORY]: repository = '',
-            [CONFIG.STORAGE_KEYS.GITHUB_BRANCH]: branch = 'main',
-            [CONFIG.STORAGE_KEYS.GITHUB_AUTO_BACKUP]: autoBackup = false
+            [CONFIG.STORAGE_KEYS.GITHUB_BRANCH]: branch = 'main'
         } = await StorageUtils.get([
             CONFIG.STORAGE_KEYS.GITHUB_PAT,
             CONFIG.STORAGE_KEYS.GITHUB_REPOSITORY,
-            CONFIG.STORAGE_KEYS.GITHUB_BRANCH,
-            CONFIG.STORAGE_KEYS.GITHUB_AUTO_BACKUP
+            CONFIG.STORAGE_KEYS.GITHUB_BRANCH
         ]);
 
-        return { pat, repository, branch, autoBackup };
+        return { pat, repository, branch };
     },
 
     async validateConfig(config) {
@@ -50,26 +45,6 @@ const GitHubBackup = {
         return errors;
     },
 
-    async testConnection(config) {
-        try {
-            const response = await fetch(`https://api.github.com/repos/${config.repository}`, {
-                headers: {
-                    'Accept': 'application/vnd.github+json',
-                    'Authorization': `Bearer ${config.pat}`,
-                    'X-GitHub-Api-Version': '2022-11-28'
-                }
-            });
-
-            if (!response.ok) {
-                throw new Error(`GitHub API error: ${response.status} ${response.statusText}`);
-            }
-
-            return { success: true };
-        } catch (error) {
-            return { success: false, error: error.message };
-        }
-    },
-
     async getFileInfo(config, filename) {
         try {
             const response = await fetch(
@@ -84,7 +59,7 @@ const GitHubBackup = {
             );
 
             if (response.status === 404) {
-                return null; // File doesn't exist
+                return null;
             }
 
             if (!response.ok) {
@@ -102,13 +77,17 @@ const GitHubBackup = {
         }
     },
 
-    async uploadBackup(config, backupData, filename) {
-        try {
-            const content = btoa(JSON.stringify(backupData, null, 2));
-            const message = `Auto-backup: ${new Date().toISOString()}`;
+    getBackupFilename() {
+        return 'catch-all-email-backup.json';
+    },
 
-            // Check if file exists to get SHA for update
-            const existingFile = await this.getFileInfo(config, filename);
+    async uploadBackup(config, backupData, filename = null) {
+        try {
+            const backupFilename = filename || this.getBackupFilename();
+            const content = btoa(JSON.stringify(backupData, null, 2));
+            const message = `Catch-All Email Backup: ${new Date().toISOString()}`;
+
+            const existingFile = await this.getFileInfo(config, backupFilename);
 
             const requestBody = {
                 message,
@@ -116,13 +95,12 @@ const GitHubBackup = {
                 branch: config.branch
             };
 
-            // Add SHA if file exists (for update)
             if (existingFile) {
                 requestBody.sha = existingFile.sha;
             }
 
             const response = await fetch(
-                `https://api.github.com/repos/${config.repository}/contents/${filename}`,
+                `https://api.github.com/repos/${config.repository}/contents/${backupFilename}`,
                 {
                     method: 'PUT',
                     headers: {
@@ -136,15 +114,16 @@ const GitHubBackup = {
             );
 
             if (!response.ok) {
-                const errorData = await response.json().catch(() => ({}));
-                throw new Error(`Upload failed: ${response.status} ${response.statusText} - ${errorData.message || ''}`);
+                const errorText = await response.text();
+                throw new Error(errorText);
             }
 
             const result = await response.json();
             return {
                 success: true,
                 url: result.content.html_url,
-                sha: result.content.sha
+                sha: result.content.sha,
+                filename: backupFilename
             };
         } catch (error) {
             console.error('Error uploading backup:', error);
@@ -156,32 +135,25 @@ const GitHubBackup = {
         try {
             const config = await this.getConfig();
 
-            if (!config.autoBackup || !await this.isConfigured()) {
-                return; // Auto-backup disabled or not configured
+            if (!await this.isConfigured()) {
+                return;
             }
 
-            // Generate backup data (excluding PAT)
             const backupData = await ExportUtils.generateBackupData();
-
-            // Generate filename with timestamp
-            const timestamp = new Date().toISOString().slice(0, 19).replace(/:/g, '-');
-            const filename = `catch-all-email-backup-${timestamp}.json`;
-
-            const result = await this.uploadBackup(config, backupData, filename);
+            const result = await this.uploadBackup(config, backupData);
 
             console.log('Auto-backup successful:', result.url);
 
-            // Store last backup info
             await StorageUtils.set({
                 [CONFIG.STORAGE_KEYS.LAST_BACKUP_DATE]: new Date().toISOString(),
-                [CONFIG.STORAGE_KEYS.LAST_BACKUP_URL]: result.url
+                [CONFIG.STORAGE_KEYS.LAST_BACKUP_URL]: result.url,
+                [CONFIG.STORAGE_KEYS.LAST_BACKUP_ERROR]: null
             });
 
             return result;
         } catch (error) {
             console.error('Auto-backup failed:', error);
 
-            // Store last backup error
             await StorageUtils.set({
                 [CONFIG.STORAGE_KEYS.LAST_BACKUP_ERROR]: error.message,
                 [CONFIG.STORAGE_KEYS.LAST_BACKUP_DATE]: new Date().toISOString()
@@ -189,20 +161,6 @@ const GitHubBackup = {
 
             throw error;
         }
-    },
-
-    async manualBackup() {
-        const config = await this.getConfig();
-
-        if (!await this.isConfigured()) {
-            throw new Error('GitHub backup not configured');
-        }
-
-        const backupData = await ExportUtils.generateBackupData();
-        const timestamp = new Date().toISOString().slice(0, 19).replace(/:/g, '-');
-        const filename = `catch-all-email-manual-backup-${timestamp}.json`;
-
-        return await this.uploadBackup(config, backupData, filename);
     },
 
     async getLastBackupInfo() {

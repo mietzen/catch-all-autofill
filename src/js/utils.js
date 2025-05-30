@@ -1,10 +1,6 @@
-// Global wordlist cache
 let cachedWordlist = null;
 let cachedWordlistUrl = null;
 
-/**
- * Storage utilities
- */
 const StorageUtils = {
   async get(keys) {
     return browser.storage.sync.get(keys);
@@ -68,7 +64,6 @@ const WordlistManager = {
     try {
       const selection = await this.getCurrentSelection();
 
-      // Check cache
       if (!forceReload && cachedWordlist && cachedWordlistUrl === selection) {
         return cachedWordlist;
       }
@@ -76,7 +71,6 @@ const WordlistManager = {
       let wordlist;
 
       if (selection === CONFIG.WORDLISTS.CUSTOM_KEY) {
-        // Load from custom URL
         const { [CONFIG.STORAGE_KEYS.WORDLIST_URL]: customUrl } =
           await StorageUtils.get(CONFIG.STORAGE_KEYS.WORDLIST_URL);
 
@@ -84,7 +78,6 @@ const WordlistManager = {
           throw new Error('Custom wordlist selected but no URL configured');
         }
 
-        // Try local storage cache for custom URL
         if (!forceReload) {
           const cacheKey = StorageUtils.generateCacheKey(customUrl);
           const cached = await StorageUtils.getLocal(cacheKey);
@@ -97,18 +90,15 @@ const WordlistManager = {
 
         wordlist = await this.fetchFromUrl(customUrl);
 
-        // Cache custom wordlist
         const cacheKey = StorageUtils.generateCacheKey(customUrl);
         await StorageUtils.setLocal({ [cacheKey]: wordlist });
 
       } else {
-        // Load local wordlist
         const wordlistConfig = CONFIG.WORDLISTS.AVAILABLE.find(w => w.code === selection);
         if (!wordlistConfig) {
           throw new Error(`Unknown wordlist selection: ${selection}`);
         }
 
-        // Try local storage cache for local wordlist
         if (!forceReload) {
           const cacheKey = `local_wordlist_${selection}`;
           const cached = await StorageUtils.getLocal(cacheKey);
@@ -121,7 +111,6 @@ const WordlistManager = {
 
         wordlist = await this.fetchLocalWordlist(wordlistConfig.file);
 
-        // Cache local wordlist
         const cacheKey = `local_wordlist_${selection}`;
         await StorageUtils.setLocal({ [cacheKey]: wordlist });
       }
@@ -130,7 +119,6 @@ const WordlistManager = {
         throw new Error(`Wordlist too small (less than ${CONFIG.EMAIL.MIN_WORDLIST_SIZE} words)`);
       }
 
-      // Update memory cache
       cachedWordlist = wordlist;
       cachedWordlistUrl = selection;
 
@@ -138,7 +126,6 @@ const WordlistManager = {
 
     } catch (error) {
       console.error('Failed to load wordlist:', error);
-      // Default to English wordlist instead of fallback
       try {
         const englishConfig = CONFIG.WORDLISTS.AVAILABLE.find(w => w.code === 'en');
         const wordlist = await this.fetchLocalWordlist(englishConfig.file);
@@ -200,12 +187,10 @@ class EmailGenerator {
 
       email = `${word1}_${word2}_${digits}@${domain}`;
 
-      // Check length
       if (email.length > CONFIG.EMAIL.MAX_EMAIL_LENGTH) {
         continue;
       }
 
-      // Check for collision
       if (await this.isEmailUnique(email)) {
         break;
       }
@@ -226,25 +211,22 @@ class EmailGenerator {
       return !usageLog.some(entry => entry.generatedEmail === email);
     } catch (error) {
       console.error('Error checking email uniqueness:', error);
-      return true; // Assume unique if check fails
+      return true;
     }
   }
 
   static validateEmail(email) {
     const errors = [];
 
-    // Length check
     if (email.length > CONFIG.EMAIL.MAX_EMAIL_LENGTH) {
       errors.push(`Email too long (${email.length}/${CONFIG.EMAIL.MAX_EMAIL_LENGTH} chars)`);
     }
 
-    // Basic format check
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
       errors.push('Invalid email format');
     }
 
-    // Local part length (before @)
     const localPart = email.split('@')[0];
     if (localPart && localPart.length > 64) {
       errors.push('Local part too long (max 64 chars)');
@@ -265,9 +247,6 @@ class EmailGenerator {
   }
 };
 
-/**
- * Usage logging utilities
- */
 const UsageLogger = {
   async log(domain, generatedEmail) {
     const date = new Date().toISOString();
@@ -308,7 +287,6 @@ const UIUtils = {
       await navigator.clipboard.writeText(text);
       return true;
     } catch (err) {
-      // Fallback for Firefox
       const textarea = document.createElement('textarea');
       textarea.value = text;
       textarea.style.position = 'fixed';
@@ -331,7 +309,6 @@ const UIUtils = {
   },
 
   showNotification(message, isError = false, container = document.body) {
-    // Remove existing notification
     const existing = container.querySelector(`.${CONFIG.CSS_CLASSES.NOTIFICATION}`);
     if (existing) {
       existing.remove();
@@ -359,12 +336,10 @@ const UIUtils = {
     notification.textContent = message;
     container.appendChild(notification);
 
-    // Animate in
     requestAnimationFrame(() => {
       notification.style.transform = 'translateX(0)';
     });
 
-    // Remove after delay
     setTimeout(() => {
       notification.style.transform = 'translateX(100%)';
       setTimeout(() => {
@@ -376,9 +351,6 @@ const UIUtils = {
   }
 };
 
-/**
- * Browser utilities
- */
 const BrowserUtils = {
   async getCurrentTab() {
     const [tab] = await browser.tabs.query({ active: true, currentWindow: true });
@@ -422,19 +394,14 @@ const ValidationUtils = {
   }
 };
 
-/**
- * Export management
- */
 const ExportUtils = {
   async generateBackupData() {
-    // Get all extension data
     const [usageLog, syncStorage, localStorage] = await Promise.all([
       UsageLogger.getLog(),
-      StorageUtils.get(null), // Get all sync storage
-      StorageUtils.getLocal(null) // Get all local storage
+      StorageUtils.get(null),
+      StorageUtils.getLocal(null)
     ]);
 
-    // Prepare export data (exclude GitHub PAT for security)
     const exportData = {
       metadata: {
         exportDate: new Date().toISOString(),
@@ -442,22 +409,18 @@ const ExportUtils = {
         extensionId: CONFIG.EXTENSION_ID
       },
       settings: {
-        // Core settings from sync storage
         catchAllDomain: syncStorage[CONFIG.STORAGE_KEYS.CATCH_ALL_DOMAIN] || '',
         wordlistSelection: syncStorage[CONFIG.STORAGE_KEYS.WORDLIST_SELECTION] || CONFIG.WORDLISTS.DEFAULT,
         wordlistUrl: syncStorage[CONFIG.STORAGE_KEYS.WORDLIST_URL] || '',
         dataVersion: syncStorage[CONFIG.STORAGE_KEYS.DATA_VERSION] || CONFIG.DATA_VERSION,
-        // GitHub settings (excluding PAT for security)
         githubRepository: syncStorage[CONFIG.STORAGE_KEYS.GITHUB_REPOSITORY] || '',
         githubBranch: syncStorage[CONFIG.STORAGE_KEYS.GITHUB_BRANCH] || 'main',
         githubAutoBackup: syncStorage[CONFIG.STORAGE_KEYS.GITHUB_AUTO_BACKUP] || false
       },
       cache: {
-        // Local storage cache data (wordlists, etc.)
         localStorageKeys: Object.keys(localStorage).filter(key => 
           key.startsWith('wordlist_') || key.startsWith('local_wordlist_')
         ),
-        // Note: We don't export actual cached wordlist data to keep file size reasonable
         cacheInfo: `${Object.keys(localStorage).length} cached items`
       },
       usageLog: usageLog,
@@ -497,12 +460,10 @@ const ExportUtils = {
     try {
       const data = typeof jsonData === 'string' ? JSON.parse(jsonData) : jsonData;
       
-      // Validate import data structure
       if (!data.settings && !data.usageLog) {
         throw new Error('Invalid backup file format');
       }
 
-      // Import settings
       if (data.settings) {
         const settingsToImport = {};
         
@@ -518,7 +479,6 @@ const ExportUtils = {
           settingsToImport[CONFIG.STORAGE_KEYS.WORDLIST_URL] = data.settings.wordlistUrl;
         }
 
-        // Import GitHub settings (excluding PAT)
         if (data.settings.githubRepository) {
           settingsToImport[CONFIG.STORAGE_KEYS.GITHUB_REPOSITORY] = data.settings.githubRepository;
         }
@@ -534,7 +494,6 @@ const ExportUtils = {
         await StorageUtils.set(settingsToImport);
       }
 
-      // Import usage log
       if (data.usageLog && Array.isArray(data.usageLog)) {
         await StorageUtils.set({ [CONFIG.STORAGE_KEYS.USAGE_LOG]: data.usageLog });
       }
@@ -552,7 +511,6 @@ const ExportUtils = {
 };
 
 const FlagIcons = {
-  // Available country codes from the flag-icons.css
   availableFlags: ['ad', 'ae', 'af', 'ag', 'ai', 'al', 'am', 'ao', 'aq', 'ar', 'arab', 'as', 'asean', 'at', 'au', 'aw', 'ax', 'az', 'ba', 'bb', 'bd', 'be', 'bf', 'bg', 'bh', 'bi', 'bj', 'bl', 'bm', 'bn', 'bo', 'bq', 'br', 'bs', 'bt', 'bv', 'bw', 'by', 'bz', 'ca', 'cc', 'cd', 'cefta', 'cf', 'cg', 'ch', 'ci', 'ck', 'cl', 'cm', 'cn', 'co', 'cp', 'cr', 'cu', 'cv', 'cw', 'cx', 'cy', 'cz', 'de', 'dg', 'dj', 'dk', 'dm', 'do', 'dz', 'eac', 'ec', 'ee', 'eg', 'eh', 'er', 'es-ct', 'es-ga', 'es-pv', 'es', 'et', 'eu', 'fi', 'fj', 'fk', 'fm', 'fo', 'fr', 'ga', 'gb-eng', 'gb-nir', 'gb-sct', 'gb-wls', 'gb', 'gd', 'ge', 'gf', 'gg', 'gh', 'gi', 'gl', 'gm', 'gn', 'gp', 'gq', 'gr', 'gs', 'gt', 'gu', 'gw', 'gy', 'hk', 'hm', 'hn', 'hr', 'ht', 'hu', 'ic', 'id', 'ie', 'il', 'im', 'in', 'io', 'iq', 'ir', 'is', 'it', 'je', 'jm', 'jo', 'jp', 'ke', 'kg', 'kh', 'ki', 'km', 'kn', 'kp', 'kr', 'kw', 'ky', 'kz', 'la', 'lb', 'lc', 'li', 'lk', 'lr', 'ls', 'lt', 'lu', 'lv', 'ly', 'ma', 'mc', 'md', 'me', 'mf', 'mg', 'mh', 'mk', 'ml', 'mm', 'mn', 'mo', 'mp', 'mq', 'mr', 'ms', 'mt', 'mu', 'mv', 'mw', 'mx', 'my', 'mz', 'na', 'nc', 'ne', 'nf', 'ng', 'ni', 'nl', 'no', 'np', 'nr', 'nu', 'nz', 'om', 'pa', 'pc', 'pe', 'pf', 'pg', 'ph', 'pk', 'pl', 'pm', 'pn', 'pr', 'ps', 'pt', 'pw', 'py', 'qa', 're', 'ro', 'rs', 'ru', 'rw', 'sa', 'sb', 'sc', 'sd', 'se', 'sg', 'sh-ac', 'sh-hl', 'sh-ta', 'sh', 'si', 'sj', 'sk', 'sl', 'sm', 'sn', 'so', 'sr', 'ss', 'st', 'sv', 'sx', 'sy', 'sz', 'tc', 'td', 'tf', 'tg', 'th', 'tj', 'tk', 'tl', 'tm', 'tn', 'to', 'tr', 'tt', 'tv', 'tw', 'tz', 'ua', 'ug', 'um', 'un', 'us', 'uy', 'uz', 'va', 'vc', 've', 'vg', 'vi', 'vn', 'vu', 'wf', 'ws', 'xk', 'xx', 'ye', 'yt', 'za', 'zm', 'zw'],
 
   getFlag(countryCode) {
@@ -595,7 +553,6 @@ const FlagIcons = {
   }
 };
 
-// Export for use in extension
 if (typeof window !== 'undefined') {
   window.FlagIcons = FlagIcons;
 }

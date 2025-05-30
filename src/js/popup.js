@@ -134,5 +134,4 @@ class PopupController {
   }
 }
 
-// Initialize popup controller
 new PopupController();

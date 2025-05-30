@@ -1,8 +1,3 @@
-/**
- * Refactored background script for the extension
- * Handles notifications, context menu, and other background tasks
- */
-
 class BackgroundController {
   constructor() {
     this.init();
@@ -45,7 +40,6 @@ class BackgroundController {
 
       if (success) {
         await this.logEmailUsage(tab, generatedEmail);
-        // Trigger auto-backup after new email is logged
         this.triggerAutoBackup();
       }
     } catch (error) {
@@ -125,20 +119,17 @@ class BackgroundController {
 
   async handleStorageChange(changes, area) {
     if (area !== 'sync') return;
-    
-    // Check if settings changed (trigger auto-backup)
+
     const settingsKeys = [
       CONFIG.STORAGE_KEYS.CATCH_ALL_DOMAIN,
       CONFIG.STORAGE_KEYS.WORDLIST_SELECTION,
       CONFIG.STORAGE_KEYS.WORDLIST_URL,
       CONFIG.STORAGE_KEYS.GITHUB_REPOSITORY,
       CONFIG.STORAGE_KEYS.GITHUB_BRANCH,
-      CONFIG.STORAGE_KEYS.GITHUB_AUTO_BACKUP,
       CONFIG.STORAGE_KEYS.USAGE_LOG
     ];
-    
+
     const hasSettingsChange = settingsKeys.some(key => changes.hasOwnProperty(key));
-    
     if (hasSettingsChange) {
       this.triggerAutoBackup();
     }
@@ -146,19 +137,17 @@ class BackgroundController {
 
   async triggerAutoBackup() {
     try {
-      // Debounce backup calls to avoid rapid successive backups
       if (this.backupTimeout) {
         clearTimeout(this.backupTimeout);
       }
-      
+
       this.backupTimeout = setTimeout(async () => {
         try {
           await GitHubBackup.performAutoBackup();
         } catch (error) {
           console.error('Auto-backup failed:', error);
-          // Don't show notification for auto-backup failures to avoid spam
         }
-      }, 2000); // Wait 2 seconds before backing up
+      }, 2000);
     } catch (error) {
       console.error('Error triggering auto-backup:', error);
     }
@@ -194,7 +183,6 @@ class BackgroundController {
     if (!currentVersion || currentVersion < 2) {
       await this.migrateUsageLogFormat();
     }
-    // Add future migrations here as needed
   }
 
   async migrateUsageLogFormat() {
@@ -242,5 +230,4 @@ class BackgroundController {
   }
 }
 
-// Initialize background controller
 new BackgroundController();
